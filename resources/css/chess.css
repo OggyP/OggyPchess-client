@@ -1,0 +1,169 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+/* #131313 */
+
+#chess_board {
+    /*height: 800px;*/
+    /*width: 800px;*/
+    min-width: 100px;
+    min-height: 100px;
+    overflow: hidden;
+    background-image: url('/resources/svg/chessBoards/brownBoard.svg');
+}
+
+#pieces_layer {
+    position: relative;
+}
+
+#valid_positions {
+    position: relative;
+}
+
+#promotion_selector {
+    position: absolute;
+}
+
+tr, td, th {
+    height: 20px;
+}
+
+/*#move_list, tr, td, th {*/
+/*    border-collapse: collapse;*/
+/*    border: 1px solid white;*/
+/*    font-size: larger;*/
+/*    padding: 5px 10px;*/
+/*    font-family: 'Roboto', sans-serif;*/
+/*}*/
+
+#move_list {
+	max-height: 800px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+#wrapper {
+    display: flex;
+}
+
+th {
+    font-size: large;
+}
+
+piece {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 12.5%;
+    height: 12.5%;
+    background-size: cover;
+    z-index: 2;
+    will-change: transform;
+}
+
+oldpos {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 12.5%;
+    height: 12.5%;
+    background-size: cover;
+    z-index: 2;
+    will-change: transform;
+}
+
+.chess_piece_select {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    z-index: 99 !important;
+    background-color: whitesmoke;
+    border: 3px solid black;
+}
+
+.valid_position {
+    position: absolute;
+    z-index: 3;
+    /*width: 100px;*/
+    /*height: 100px;*/
+}
+
+.opening {
+	font-family: 'Roboto', sans-serif;
+}
+
+.piece_moved_self {
+    background-color: #035bff77;
+}
+
+.previous_place_self {
+    background-color: #588df077;
+}
+
+.piece_moved_other {
+    background-color: #fe232377;
+}
+
+.previous_place_other {
+    background-color: #ff535377;
+}
+
+#home {
+    width: 100%;
+    height: 100%;
+}
+
+#pgn_input {
+    width: 50%;
+    height: 100px;
+    margin: 10px;
+}
+
+/*.home_item {*/
+/*    display: block;*/
+/*}*/
+
+button {
+    width: 150px;
+    height: 50px;
+    text-align: center;
+    font-size: x-large;
+    margin: 10px;
+    display: block;
+}
+
+h3 {
+    margin: 30px 50px;
+}
+
+#black_timer,
+#white_timer {
+    font-size: 12mm;
+    height: 10px;
+    padding: 0;
+}
+
+.time_taken {
+    font-size: small;
+    color: var(--grey);
+}
+
+.green_text {
+    color: #0fee55;
+}
+
+.red_text {
+    color: red;
+}
+
+.grey_text {
+    color: var(--grey);
+}
+
+.timer_text {
+    border-radius: var(--bdrs);
+    padding: 0 5mm 1mm 5mm;
+}
+	
+.green_background {
+    background-color: green;
+}

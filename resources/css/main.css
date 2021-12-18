@@ -1,0 +1,326 @@
+/********************
+      VARIABLES
+********************/
+:root {
+    --primary: #ff1500;
+    --secondary: #f88c00;
+
+    /* TONES */
+    --mignight: #131313;
+    --night: #171717;
+    --evening: #1f1f1f;
+    --dark: #2d2d2d;
+    --grey: #464646;
+    --fog: #bfbfbf;
+
+    /* MODE CONTROL */
+    --bg-1: var(--evening);
+    --bg-2: var(--night);
+    --txt: white;
+
+    /* FONTS */
+    --font-1: 'Noto Sans JP', sans-serif;
+}
+
+
+
+
+/********************
+       GENERAL
+********************/
+html {
+    background: var(--bg-1);
+    font-size: 16px;
+    font-family: var(--font-1);
+    font-weight: 300;
+    color: var(--txt);
+}
+
+.full-screen-menu {
+    min-width: 100vw;
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.full-screen-menu.panelled {
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.spread-items {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bg-img {
+    opacity: 0.5;
+    width: 40%;
+    position: absolute;
+    z-index: -1;
+}
+
+.panel {
+    background: var(--bg-2);
+    
+    --bdrs: 15px;
+    -webkit-border-radius: var(--bdrs);
+    -moz-border-radius: var(--bdrs);
+    border-radius: var(--bdrs);
+    
+    padding: 25px;
+}
+
+.centre-items {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.disabled:hover {}
+
+
+
+
+/********************
+  LOGIN & REGISTER
+********************/
+#login-wrapper label {
+    display: none;
+}
+
+
+
+
+/********************
+       LOADING
+********************/
+    /* Thanks to thetallweeks on CodePen for the loading animation */
+.loading {
+    margin-top: 0;
+    position: relative;
+}
+
+.loading:after {
+    overflow: hidden;
+    position: absolute;
+    display: inline-block;
+    vertical-align: bottom;
+    -webkit-animation: ellipsis steps(4,end) 1000ms infinite;
+    animation: ellipsis steps(4,end) 1000ms infinite;
+    content: "...";
+    width: 0px;
+}
+
+@keyframes ellipsis {
+    to {
+        width: 1.3em;
+    }
+}
+
+
+
+
+/********************
+        HOME
+********************/
+#home > div {
+    width: 45%;
+}
+
+h1 img {
+    width: 50px;
+}
+
+.home_item {
+    font-size: 20px;
+}
+
+
+/* MENUS */
+.home_menu {
+    background: var(--mignight);
+    opacity: 0;
+
+    --bdrs: 10px;
+    -webkit-border-radius: var(--bdrs);
+    -moz-border-radius: var(--bdrs);
+    border-radius: var(--bdrs);
+
+    padding: 45px 15px;
+    width: 500px;
+    height: 400px;
+
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    left: calc((100vw - 500px) / 2);
+    top: calc((100vh - 400px) / 2);
+}
+
+.home_menu .closebtn {
+    margin: 0;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+
+/* GAME IMPORT */
+#import-menu {
+    padding: 15px;
+    width: 30vw;
+    height: 60vh;
+    justify-content: space-between;
+    left: 35vw;
+    top: 20vh;
+}
+
+#import-menu * {
+    margin: 0;
+}
+
+#import-menu label {
+    margin-bottom: 10px;
+    display: block;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+#import-menu textarea {
+    width: 100%;
+    height: 40vh;
+}
+
+
+/* TIME SELECTION */
+#time-selection-menu input[type='radio'] {
+    display: none;
+}
+
+#time_control_start,
+#time_control_inc {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+
+/* ACCOUNT INFO */
+#account-username {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    font-size: 30px;
+}
+
+#account-rating {
+    margin-left: 20px;
+    display: inline-block;
+    font-size: 16px;
+    color: var(--fog);
+}
+
+#account > h3 {
+    margin-top: 1em;
+}
+
+
+/* PREVIOUS GAMES */
+#previous_games-wrapper {
+    overflow: auto;
+    width: 500px;
+    max-height: 65vh;
+    display: flex;
+    justify-content: center;
+    /*display: block;*/
+}
+
+#previous_games {
+    border-spacing: 0;
+    border-collapse: separate;
+    width: 100%;
+}
+
+#previous_games tr {
+    cursor: pointer;
+}
+
+#previous_games td {
+    border: none;
+    outline: none;
+}
+
+.old-games-id,
+.old-games-right-spacer {
+    width: 100px;
+    color: var(--grey);
+}
+
+.old-games-white {
+    text-align: right;
+}
+
+.old-games-vs {
+    width: 50px;
+    text-align: center;
+}
+
+.old-games-result {
+    text-align: center;
+}
+
+
+
+
+/********************
+        GAME
+********************/
+#chess_board-wrapper {
+    width: min(50vw, 100vh);
+    height: min(50vw, 100vh);
+}
+
+#game_wrapper > .panel {
+    width: 25vw;
+}
+
+#move_wrapper {
+    overflow: auto;
+    width: 100%;
+    max-height: 55vh;
+    display: flex;
+    justify-content: center;
+}
+
+#move_list {
+    width: 100%;
+}
+
+#move_list td,
+#move_list th {
+    padding: 5px 0;
+}
+
+.move-num {
+    width: 75px;
+}
