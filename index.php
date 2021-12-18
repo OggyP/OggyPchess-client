@@ -3,7 +3,7 @@
 <?php
 $gameInfo = null;
 $pgnVal = null;
-$assetURL = '<link rel="stylesheet" href="/resources/css/pieces.css">';
+$assetURL = '<link rel="stylesheet" href="/resources/svg/pieces/pieces.css">';
 if (isset($_GET['game'])) {
     $isViewingGame = true;
     $gameId = $_GET['game'];
@@ -43,10 +43,10 @@ if (isset($_GET['game'])) {
 if (isset($_GET['assets'])) {
     $assetType = $_GET['assets'];
     if ($assetType == 'ewan') {
-        $assetURL = '<link rel="stylesheet" href="/resources/css/ewanPieces.css">';
+        $assetURL = '<link rel="stylesheet" href="/resources/svg/pieces/ewanPieces.css">';
     }
     if ($assetType == 'horsey') {
-        $assetURL = '<link rel="stylesheet" href="/resources/css/horsey.css">';
+        $assetURL = '<link rel="stylesheet" href="/resources/svg/pieces/horsey.css">';
     }
 }
 ?>
