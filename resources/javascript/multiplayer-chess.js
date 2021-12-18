@@ -23,6 +23,8 @@ let pieceMoved = null
 let oldPos = null
 let importedPGN = false
 
+let lastDrawnBoard = null;
+
 let gavinAudio = new Audio('/resources/audio/gavinCheck.mp3')
 
 const startingPos = [
@@ -1027,6 +1029,7 @@ function getVectorsAbsolute(xVal, yVal, vectors, team) {
 var ownTeam = null;
 
 function drawBoard(board = chessBoard, turnToCheck = null) {
+    lastDrawnBoard = clone(board)
     let moveType = "self"
     if ((turnToCheck === null && pieceMoved !== null && board[pieceMoved[1]][pieceMoved[0]].team !== ownTeam) || (turnToCheck !== null && !turnToCheck)) moveType = "other"
     resizeCheck()
