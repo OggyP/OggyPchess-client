@@ -1,17 +1,12 @@
 let flipBoard = false;
-let valid_positions = $("#valid_positions");
-let piecesLayer = $("#pieces_layer");
-let promotionSelector = $("#promotion_selector")
-let promotionSelectorImg = $("#promotion_options")
-let moveList = $("#move_list")
-let PGNView = $("#PGN_view")
-// let whiteBoard = $("#board_layer_white")
-// let blackBoard = $("#board_layer_black")
-let openingDisplay = $("#opening")
+const valid_positions = $("#valid_positions");
+const piecesLayer = $("#pieces_layer");
+const moveList = $("#move_list")
+const PGNView = $("#PGN_view")
+const openingDisplay = $("#opening")
 let selectedPiece = null;
 let moveNum = 0
 let fiftyMoveRuleCountDown = 50
-let reDrawBoard = null
 
 let turn = true;
 let forcedEnpassant = true;
@@ -22,8 +17,6 @@ let showingBoard = 0;
 let pieceMoved = null
 let oldPos = null
 let importedPGN = false
-
-let lastDrawnBoard = null;
 
 let gavinAudio = new Audio('/resources/audio/gavinCheck.mp3')
 
@@ -37,6 +30,19 @@ const startingPos = [
     ["pl", "pl", "pl", "pl", "pl", "pl", "pl", "pl"],
     ["rl", "nl", "bl", "ql", "kl", "bl", "nl", "rl"],
 ]
+
+const emptyBoard = [
+    ["NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA"],
+    ["NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA"],
+    ["NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA"],
+    ["NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA"],
+    ["NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA"],
+    ["NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA"],
+    ["NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA"],
+    ["NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA"],
+]
+
+let reDrawBoard = emptyBoard;
 
 let pgnMetaValues = {
     "Event" : "?",
@@ -124,8 +130,6 @@ for (let y = 0; y < 8; y++) {
     }
 }
 
-drawBoard()
-
 function reveivedMove(event) {
     timers = event.data.timer
     timers.whiteTimer.timerStartTime = new Date().getTime()
@@ -187,7 +191,6 @@ function reveivedMove(event) {
         }
         if (ownTeam === !turn && inCheck(chessBoard, !turn)) {
             gavinAudio.play()
-            console.log("PLAY AUDIO")
         }
         turn = !turn
         boardAtMove.push({'board': clone(chessBoard), 'startPos': event.data.startingPos, 'endingPos': event.data.endingPos})
@@ -206,7 +209,6 @@ function reveivedMove(event) {
         alert("Ok Gavin")
     }
     if (forcedEnpassant && turn === ownTeam) {
-        console.log("ATTEMPTING")
         for (let y = 0; y < 8; y++) {
             for (let x = 0; x < 8; x++) {
                 if (chessBoard[y][x] !== "NA" && chessBoard[y][x].team === ownTeam  && chessBoard[y][x].piece === 'p') {
@@ -218,7 +220,6 @@ function reveivedMove(event) {
                             newBoard[y][x] = "NA"
                             newBoard[y][locations[i][0]] = "NA"
                             if (!inCheck(newBoard, ownTeam)) {
-                                console.log("SENT")
                                 sendToWs('move', [['startingPos', [x, y]], ['endingPos', [locations[i][0], locations[i][1]]]])
                             }
                         }
@@ -257,25 +258,19 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
         lines.pop()
         lines.forEach(line => {
             if (line[0] === '[') {
-                console.log(line)
                 PGNMeta[line.split(' ')[0].slice(1)] = line.split('"')[1]
             }
         })
         
-        console.log(PGNMeta)
         pgnValues = pgnValues.split(" ")
-        console.log(pgnValues)
         if (PGNMeta.hasOwnProperty('FEN')) {
             // Custom starting positions
             chessBoard = FENtoGame(PGNMeta["FEN"])
-            console.log("Custom Position Found")
-            console.log(chessBoard)
         }
         if (PGNMeta.hasOwnProperty('Mode')) {
             chessMode = PGNMeta["Mode"]
         }
 
-        console.log(pgnValues)
         $('#loading').hide()
         $('#queue_page').hide()
         $('#home').hide()
@@ -292,17 +287,13 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
             if (move === '1-0' || move === '0-1' || move === '1/2-1/2') { // - means it is the end of the pgn and is the score,
                 moveList.append("<tr><td class='move-num'>Game Over</td><td>" + move + "</td></tr>")
             } else if (!move.includes('.')) { // the . means it is a move number indicator
-                console.log("NEXT MOVE | " + moveNum)
-                console.log("Original PGN: " + move)
                 let originalMove = move
                 let promoteChoice = false
                 let isCheckMate = move.includes('#')
                 move = move.replace('x', '').replace('+', '').replace('#', '')
                 move = move.split('=')
                 if (move.length === 2) promoteChoice = move[1]
-                console.log("Promotion: " + promoteChoice)
                 move = move[0]
-                console.log("Formatted Move: " + move)
                 let startingPos
                 let endingPos
                 if (move === 'O-O') {
@@ -340,7 +331,6 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
                         displayError('Invalid PGN Castle Queen Side', 'Error at internal move number ' + moveNum + ', ' + originalMove)
                     }
                 } else if (move.length === 2) {
-                    console.log("Pawn Move")
                     // pawn move / pawn promote | no special case
                     const xVal = fromChessNotation.x[move[0]]
                     const yVal = fromChessNotation.y[move[1]]
@@ -371,7 +361,6 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
                         displayError('Invalid PGN Pawn Move', 'Error at internal move number ' + moveNum + ', ' + originalMove)
                     }
                 } else if (move[0] === move[0].toUpperCase()) {
-                    console.log("Non Pawn Move")
                     // not pawn
                     let extraVals = move.length - 3
                     endingPos = [fromChessNotation.x[move[1 + extraVals]], fromChessNotation.y[move[2 + extraVals]]]
@@ -410,8 +399,6 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
                     let takeOffset = (turn) ? 1 : -1 // white takes from a y level one larger than what it is taking, black is opposite at 1 y level lower
                     endingPos = [fromChessNotation.x[move[1]], fromChessNotation.y[move[2]]]
                     let startingX = fromChessNotation.x[move[0]]
-                    console.log(endingPos[1])
-                    console.log(takeOffset)
                     let response = legalMovesOfPiece([startingX, endingPos[1] + takeOffset], endingPos)
                     if (response[0] === 'enpassant' || response[0] === true) {
                         startingPos = [startingX, endingPos[1] + takeOffset]
@@ -453,7 +440,6 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
                 }
                 turn = !turn
                 moveNum++
-                console.log(chessBoard)
                 oldPos = startingPos
                 pieceMoved = endingPos
                 boardAtMove.push({'board': clone(chessBoard), 'startPos': startingPos, 'endingPos': endingPos})
@@ -570,23 +556,17 @@ function alertOfGameOver(score, reason) {
 function pieceMove(xVal, yVal, specialCase = false, type = "enpassant") {
     if (chessBoard[selectedPiece[1]][selectedPiece[0]].code === 'pl' && yVal === 0) {
         // show promotion selector light
-        promotionSelectorImg.empty()
+        $("piecePromote").remove()
         let pieceCodes = ['ql', 'rl', 'bl', 'nl']
-        for (let idx = 0; idx < pieceCodes.length; idx++) {
-            promotionSelectorImg.append('<img onclick="promote(' + xVal + ', ' + yVal + ', \'' + pieceCodes[idx] + '\')" draggable="false" class="chess_piece_select" src="chessAssets/Chess_' + pieceCodes[idx] + 't60.png" alt="K-L" style="top: ' + (yVal * boxSize) + 'px; left: ' + (xVal * boxSize + idx * 60 + 20) + 'px;">')
-        }
-        promotionSelector.show()
-        promotionSelectorImg.show()
+        for (let idx = 0; idx < pieceCodes.length; idx++) 
+            piecesLayer.append('<piecePromote onclick="promote(' + xVal + ', ' + yVal + ', \'' + pieceCodes[idx] + '\')" draggable="false" class="' + pieceCodes[idx][0] + ' ' + pieceCodes[idx][1] + `" alt="K-L" style="transform: translate(${((idx * 3 / 4) * boxSize) + 'px, ' + (yVal * boxSize)}px);"></piecePromote>`)
     }
     else if (yVal === 7 && chessBoard[selectedPiece[1]][selectedPiece[0]].code === 'pd') {
         // show promotion selector light
-        promotionSelectorImg.empty()
+        $("piecePromote").remove()
         let pieceCodes = ['qd', 'rd', 'bd', 'nd']
-        for (let idx = 0; idx < pieceCodes.length; idx++) {
-            promotionSelectorImg.append('<img onclick="promote(' + xVal + ', ' + yVal + ', \'' + pieceCodes[idx] + '\')" draggable="false" class="chess_piece_select" src="chessAssets/Chess_' + pieceCodes[idx] + 't60.png" alt="K-L" style="top: ' + (yVal * boxSize) + 'px; left: ' + (xVal * boxSize + idx * 60 + 20) + 'px;">')
-        }
-        promotionSelector.show()
-        promotionSelectorImg.show()
+        for (let idx = 0; idx < pieceCodes.length; idx++)
+            piecesLayer.append('<piecePromote onclick="promote(' + xVal + ', ' + yVal + ', \'' + pieceCodes[idx] + '\')" draggable="false" class="' + pieceCodes[idx][0] + ' ' + pieceCodes[idx][1] + `" alt="K-L" style="transform: translate(${((idx * 3 / 4) * boxSize) + 'px, ' + (yVal * boxSize)}px);"></piecePromote>`)
     } else {
         if (selectedPiece !== null && chessBoard[selectedPiece[1]][selectedPiece[0]] !== 'NA') {
             sendToWs('move', [['startingPos', selectedPiece], ['endingPos', [xVal, yVal]]])
@@ -606,8 +586,7 @@ function pieceMove(xVal, yVal, specialCase = false, type = "enpassant") {
 
 function promote(xVal, yVal, choice) {
     sendToWs('move', [['startingPos', selectedPiece], ['endingPos', [xVal, yVal]], ['promote', choice]])
-    promotionSelector.hide()
-    promotionSelectorImg.hide()
+    $("piecePromote").remove()
     valid_positions.empty();
 }
 
@@ -706,8 +685,6 @@ function movesOfPiece(xVal, yVal, clickedPiece) {
                 }
             }
             //left
-            console.log(clickedPiece)
-            console.log(yVal + '|' + xVal)
             if (chessBoard[yVal][xVal - 4] !== 'NA' && chessBoard[yVal][xVal - 4].moves === 0) {
                 if (chessBoard[yVal][xVal - 3] === 'NA' && chessBoard[yVal][xVal - 2] === 'NA' && chessBoard[yVal][xVal - 1] === 'NA') {
                     // can castle not including through check
@@ -748,7 +725,6 @@ function writePGN() {
     output += "\n"
     output += pgnText
     pgnDownload = output
-    console.log("WRITEN PGN")
 }
 
 function inCheck(board, team) {
@@ -917,7 +893,6 @@ function goToMove(moveNum) {
     showingBoard = moveNum
     drawCurrentBoard = false;
     let boardSelected = boardAtMove[moveNum]
-    console.log(boardSelected)
     if (boardSelected.hasOwnProperty('startPos'))
         oldPos = boardSelected.startPos
     else
@@ -1029,28 +1004,64 @@ function getVectorsAbsolute(xVal, yVal, vectors, team) {
 var ownTeam = null;
 
 function drawBoard(board = chessBoard, turnToCheck = null) {
-    lastDrawnBoard = clone(board)
     let moveType = "self"
     if ((turnToCheck === null && pieceMoved !== null && board[pieceMoved[1]][pieceMoved[0]].team !== ownTeam) || (turnToCheck !== null && !turnToCheck)) moveType = "other"
     resizeCheck()
-    reDrawBoard = clone(board)
-    piecesLayer.empty();
+    let extraPieces = []
+    let needPieces = []
     for (let y = 0; y < 8; y++)
-        for (let x = 0; x < 8; x++)
-            if (board[y][x] !== "NA") {
-                let pieceInfo = (pieceMoved !== null && x === pieceMoved[0] && y === pieceMoved[1]) ? `class="piece_moved_${moveType} ${board[y][x].code[0]} ${board[y][x].code[1]}` : 'class="' + board[y][x].code[0] + ' ' + board[y][x].code[1] + ''              
-                pieceInfo += '"'
-                if (!flipBoard)
-                    piecesLayer.append('<piece ' + pieceInfo + ' id="piece' + x + y + '" onclick="pieceClicked(' + x + ', ' + y + ')" draggable="false" style="transform: translate(' + (x * boxSize) + 'px, ' + (y * boxSize) + 'px); width: ' + boxSize + 'px; height: ' + boxSize + 'px;"></piece')
-                else
-                    piecesLayer.append('<piece ' + pieceInfo + ' id="piece' + x + y + '" onclick="pieceClicked(' + x + ', ' + y + ')" draggable="false" style="transform: translate(' + ((7 - x) * boxSize) + 'px, ' + ((7 - y) * boxSize) + 'px); width: ' + boxSize + 'px; height: ' + boxSize + 'px;"></piece>')
+        for (let x = 0; x < 8; x++) {
+            let isDifferent = false;
+            if (board[y][x] === 'NA' && reDrawBoard[y][x] !== 'NA') isDifferent = true
+            if (board[y][x] !== 'NA' && reDrawBoard[y][x] === 'NA') isDifferent = true
+            if (board[y][x] !== 'NA' && reDrawBoard[y][x] !== 'NA' && board[y][x].code !== reDrawBoard[y][x].code) isDifferent = true
+            if (isDifferent) {
+                if (board[y][x] !== 'NA') needPieces.push([x, y])
+                if (reDrawBoard[y][x] !== 'NA') extraPieces.push([x, y])
             }
-    if (pieceMoved !== null) {
-        if (!flipBoard)
-            piecesLayer.append(`<oldpos draggable="false" class="previous_place_${moveType}" style="transform: translate(${(oldPos[0] * boxSize) + 'px, ' + (oldPos[1] * boxSize)}px); width: ${boxSize + 'px; height: ' + boxSize}px;"></oldpos>`)
-        else
-            piecesLayer.append(`<oldpos draggable="false" class="previous_place_${moveType}" style="transform: translate(${((7 - oldPos[0]) * boxSize) + 'px, ' + ((7 - oldPos[1]) * boxSize)}px); width: ${boxSize + 'px; height: ' + boxSize}px;"></oldpos>`)
+        }
+
+    let piecesToAdd = []
+    let piecesToTranslate = [] 
+    for (let i = 0; i < needPieces.length; i++) {
+        const needPiecePos = needPieces[i]
+        const pieceCode = board[needPiecePos[1]][needPiecePos[0]].code
+        let foundPieceToMove = false
+        for (let j = 0; j < extraPieces.length; j++) {
+            const extraPieceCode = reDrawBoard[extraPieces[j][1]][extraPieces[j][0]].code
+            if (extraPieceCode === pieceCode) {
+                piecesToTranslate.push({"elem": $("#piece" + extraPieces[j][0] + extraPieces[j][1]), "translateText": `translate(${(!flipBoard) ? (needPiecePos[0] * boxSize) + 'px, ' + (needPiecePos[1] * boxSize) : ((7 - needPiecePos[0]) * boxSize) + 'px, ' + ((7 - needPiecePos[1]) * boxSize)}px)`, "newId": 'piece' + needPiecePos[0] + needPiecePos[1], "onClickPos": needPiecePos[0] + ', ' + needPiecePos[1]})
+                foundPieceToMove = true
+                extraPieces.splice(j, 1)
+                break;
+            }
+        }
+        if (!foundPieceToMove) piecesToAdd.push('<piece class="' + pieceCode[0] + ' ' + pieceCode[1] + '" id="piece' + needPiecePos[0] + needPiecePos[1] + '" onclick="pieceClicked(' + needPiecePos[0] + ', ' + needPiecePos[1] + `)" draggable="false" style="transform: translate(${(!flipBoard) ? (needPiecePos[0] * boxSize) + 'px, ' + (needPiecePos[1] * boxSize) : ((7 - needPiecePos[0]) * boxSize) + 'px, ' + ((7 - needPiecePos[1]) * boxSize)}px);"></piece`)
     }
+    for (let i = 0; i < extraPieces.length; i++) {
+        const pieceToDelete = $("#piece" + extraPieces[i][0] + extraPieces[i][1])
+        pieceToDelete.remove()
+    }
+
+    piecesToTranslate.forEach(pieceToTranslate => {
+        pieceToTranslate.elem.css("transform", pieceToTranslate.translateText)
+        pieceToTranslate.elem.attr('id', pieceToTranslate.newId)
+        pieceToTranslate.elem.attr('onclick', `pieceClicked(${pieceToTranslate.onClickPos})`)
+    })
+
+    piecesToAdd.forEach(pieceToAdd => {
+        piecesLayer.append(pieceToAdd)
+    })
+    $('oldpos').remove()
+    $('piece').removeClass('piece_moved_self piece_moved_other')
+    if (pieceMoved !== null) {
+        $("#piece" + pieceMoved[0] + pieceMoved[1]).addClass("piece_moved_" + moveType)
+        if (!flipBoard)
+            piecesLayer.append(`<oldpos draggable="false" class="previous_place_${moveType}" style="transform: translate(${(oldPos[0] * boxSize) + 'px, ' + (oldPos[1] * boxSize)}px);"></oldpos>`)
+        else
+            piecesLayer.append(`<oldpos draggable="false" class="previous_place_${moveType}" style="transform: translate(${((7 - oldPos[0]) * boxSize) + 'px, ' + ((7 - oldPos[1]) * boxSize)}px);"></oldpos>`)
+    }
+    reDrawBoard = clone(board)
 }
 
 

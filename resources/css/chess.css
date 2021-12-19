@@ -49,32 +49,27 @@ th {
     font-size: large;
 }
 
-piece {
+piece,
+oldpos,
+piecePromote {
     position: absolute;
     top: 0;
     left: 0;
-    width: 12.5%;
-    height: 12.5%;
     background-size: cover;
-    z-index: 2;
     will-change: transform;
 }
 
+piece,
 oldpos {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 12.5%;
     height: 12.5%;
-    background-size: cover;
     z-index: 2;
-    will-change: transform;
 }
 
-.chess_piece_select {
-    position: absolute;
-    width: 60px;
-    height: 60px;
+
+piecePromote {
+    width: 9.375%;
+    height: 9.375%;
     z-index: 99 !important;
     background-color: whitesmoke;
     border: 3px solid black;

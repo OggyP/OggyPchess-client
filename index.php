@@ -267,9 +267,6 @@ if (isset($_GET['assets'])) {
     <div id="game_wrapper" class="full-screen-menu panelled">
         <div id="chess_board-wrapper">
             <div id="chess_board">
-                <div id="promotion_selector" style="display: none;">
-                    <div id="promotion_options" style="display: none;"></div>
-                </div>
                 <div id="pieces_layer" ></div>
                 <div id="valid_positions"></div>
             </div>

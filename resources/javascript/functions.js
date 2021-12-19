@@ -50,13 +50,15 @@ let boxSize = 100;
 
 // Handle resize
 function resizeCheck() {
-    let chessBoardDiv = $('#chess_board')
+    const chessBoardDiv = $('#chess_board')
+    const piecesDiv = $('#pieces_layer')
     wrapperWidth = $('#chess_board-wrapper').width();
     wrapperHeight = $('#chess_board-wrapper').height();
     let minSize = Math.min(wrapperWidth, wrapperHeight);
-    console.log("Min size = " + minSize)
     chessBoardDiv.width(minSize)
     chessBoardDiv.height(minSize)
+    piecesDiv.width(minSize)
+    piecesDiv.height(minSize)
     boxSize = minSize / 8
     return minSize
     // let chessPiece = $(".chess_piece")
@@ -112,7 +114,6 @@ function resetGame() {
             }
         }
     }
-    drawBoard()
     $('#share_game').hide()
     $('#home').show()
     $('#in_game_options').show()

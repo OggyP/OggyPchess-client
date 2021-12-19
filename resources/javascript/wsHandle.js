@@ -23,7 +23,7 @@ const urlParams = new URLSearchParams(queryString);
 let ws = new WebSocket('wss://chess.oggyp.com:8443');
 
 ws.onopen = function () {
-    console.log("Web Socket Connected")
+    console.log("OggyP Chess Web Socket Connected on Port 8443")
     if (urlParams.has('game')) {
         sendToWs('viewGame', [['gameId', urlParams.get('game')]])
         $('#login-wrapper').hide()
