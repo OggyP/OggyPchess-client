@@ -62,10 +62,21 @@ function resizeCheck() {
     valid_positions.width(minSize)
     valid_positions.height(minSize)
     if (boxSize !== minSize / 8) {
+        boxSize = minSize / 8
         $('piece').each(function() {
             let currentElement = $(this)
-            console.log(currentElement.id)
+            let piecePos = currentElement.attr('id').replace('piece', '')
+            piecePos = [Number(piecePos[0]), Number(piecePos[1])]
+            currentElement.css("transform", `translate(${(!flipBoard) ? piecePos[0] * boxSize : (7 - piecePos[0]) * boxSize}px, ${(!flipBoard) ? piecePos[1] * boxSize : (7 - piecePos[1]) * boxSize}px)`)
+            console.log(`translate(${(!flipBoard) ? piecePos[0] * boxSize : (7 - piecePos[0]) * boxSize}px, ${(!flipBoard) ? piecePos[1] * boxSize : (7 - piecePos[1]) * boxSize}px)`)
         })
+        $('highlightedtile').remove()
+        // $('piece').removeClass('piece_moved_self piece_moved_other')
+        if (pieceMoved !== null) {
+            // $("#piece" + pieceMoved[0] + pieceMoved[1]).addClass("piece_moved_" + moveType)
+            piecesLayer.append(`<highlightedtile draggable="false" class="previous_place_${lastMoveType}" style="transform: translate(${(!flipBoard) ? (oldPos[0] * boxSize) + 'px, ' + (oldPos[1] * boxSize) : ((7 - oldPos[0]) * boxSize) + 'px, ' + ((7 - oldPos[1]) * boxSize)}px);"></highlightedtile>`)
+            piecesLayer.append(`<highlightedtile draggable="false" class="piece_moved_${lastMoveType}" style="transform: translate(${(!flipBoard) ? (pieceMoved[0] * boxSize) + 'px, ' + (pieceMoved[1] * boxSize) : ((7 - pieceMoved[0]) * boxSize) + 'px, ' + ((7 - pieceMoved[1]) * boxSize)}px);"></highlightedtile>`)
+        }
     }
     boxSize = minSize / 8
     return minSize

@@ -138,6 +138,7 @@ function reveivedMove(event) {
     if (timers.whiteTimer.isCountingDown && ownTeam) $('#white_timer_text').addClass('green_background'); else $('#white_timer_text').removeClass('green_background');
     if (timers.blackTimer.isCountingDown && !ownTeam) $('#black_timer_text').addClass('green_background'); else $('#black_timer_text').removeClass('green_background');
     if (chessBoard[event.data.startingPos[1]][event.data.startingPos[0]] !== 'NA') {
+        $("piece").css("opacity", "1")
         pieceMoved = event.data.endingPos
         oldPos = event.data.startingPos
         if (turn) fiftyMoveRuleCountDown--
@@ -1001,6 +1002,7 @@ function getVectorsAbsolute(xVal, yVal, vectors, team) {
 
 var ownTeam = null;
 let previousBoardOrientation = false
+var lastMoveType = 'self'
 
 function drawBoard(board = chessBoard, turnToCheck = null) {
     finishAnimations()
@@ -1010,7 +1012,7 @@ function drawBoard(board = chessBoard, turnToCheck = null) {
     }
     let moveType = "self"
     if ((turnToCheck === null && pieceMoved !== null && board[pieceMoved[1]][pieceMoved[0]].team !== ownTeam) || (turnToCheck !== null && !turnToCheck)) moveType = "other"
-    resizeCheck()
+    // resizeCheck()
     let extraPieces = []
     let needPieces = []
     for (let y = 0; y < 8; y++)
@@ -1081,6 +1083,7 @@ function drawBoard(board = chessBoard, turnToCheck = null) {
     reDrawBoard = clone(board)
     animationInterval = setInterval(updateAnimations, 10)
     previousBoardOrientation = flipBoard
+    lastMoveType = moveType
     console.log("Drawn Board")
 }
 
@@ -1088,7 +1091,7 @@ function drawBoard(board = chessBoard, turnToCheck = null) {
 resizeCheck()
 window.addEventListener("resize", function() {
     valid_positions.empty()
-    drawBoard(reDrawBoard)
+    resizeCheck()
 });
 
 function rayCastVectors(xVal, yVal, vectors, clickedPiece) {
