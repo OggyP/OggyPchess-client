@@ -888,10 +888,10 @@ function appendMoveToList(startingPos, newPosition, isEnpassant, timerInfo, prom
     writePGN()
 }
 
-function goToMove(moveNum) {
-    showingBoard = moveNum
-    drawCurrentBoard = false;
-    let boardSelected = boardAtMove[moveNum]
+function goToMove(moveNumber) {
+    showingBoard = moveNumber
+    drawCurrentBoard = (moveNum === showingBoard);
+    let boardSelected = boardAtMove[moveNumber]
     if (boardSelected.hasOwnProperty('startPos'))
         oldPos = boardSelected.startPos
     else
@@ -1122,44 +1122,6 @@ function rayCastVectors(xVal, yVal, vectors, clickedPiece) {
 function clone(obj) {
     return JSON.parse(JSON.stringify(obj))
 }
-
-// keyboard input
-window.addEventListener("keydown", function (event) {
-    if (event.defaultPrevented) {
-        return; // Do nothing if the event was already processed
-    }
-
-    if (event.key === "ArrowLeft") {
-        if (drawCurrentBoard) {
-            showingBoard = moveNum - 1
-        } else {
-            showingBoard--
-        }
-        if (showingBoard >= 0) {
-            goToMove(showingBoard)
-        } else {
-            showingBoard = 0
-            goToMove(showingBoard)
-        }
-    }
-    if (event.key === "ArrowRight") {
-        if (!drawCurrentBoard) {
-            showingBoard ++
-            if (showingBoard === moveNum) {
-                drawCurrentBoard = true;
-                oldPos = boardAtMove[moveNum].startPos
-                pieceMoved = boardAtMove[moveNum].endingPos
-                if (ownTeam === null)
-                    drawBoard(chessBoard, boardAtMove[moveNum].board[boardAtMove[moveNum].endingPos[1]][boardAtMove[moveNum].endingPos[0]].team)
-                else
-                    drawBoard()
-                $('#resume_game').hide()
-            } else {
-                goToMove(showingBoard)
-            }
-        }
-    }
-}, true);
 
 // Download function found on https://stackoverflow.com/questions/3665115/how-to-create-a-file-in-memory-for-user-to-download-but-not-through-server
 function download(filename) {
