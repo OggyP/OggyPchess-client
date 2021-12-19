@@ -510,32 +510,30 @@ function pieceClicked(xVal, yVal) {
                 newBoard[yVal][xVal] = "NA"
                 let drawY = (!flipBoard) ? location[1] : 7 - location[1]
                 let drawX = (!flipBoard) ? location[0] : 7 - location[0]
+                let onClickText = null
                 if (location.length === 3) {
                     if (location[2]) {
                         //check if the king is in check
                         newBoard[yVal][location[0]] = "NA"
                         // ENPASSANT
                         if (!inCheck(newBoard, clickedPiece.team)) {
-                            valid_positions.append(' <div onclick="pieceMove(' + location[0] + ', ' + location[1] + ', true)" ondrop="drop()" class="valid_position" style="top: ' + drawY * boxSize + 'px; left: ' + drawX * boxSize + 'px;"><svg  height="' + boxSize + '" width="' + boxSize + '">\n' +
-                                '  <circle cx="' + boxSize / 2 + '" cy="' + boxSize / 2 + '" r="' + boxSize / 10 * 3 + '" fill="gray" fill-opacity="0.6"/>\n' +
-                                '</svg></div>')
+                            onClickText = 'pieceMove(' + location[0] + ', ' + location[1] + ', true)'
                         }
                     } else {
                         // castle
                         if (!inCheck(newBoard, clickedPiece.team)) {
-                            valid_positions.append(' <div onclick="pieceMove(' + location[0] + ', ' + location[1] + ', true, \'castle\')" ondrop="drop()" class="valid_position" style="top: ' + drawY * boxSize + 'px; left: ' + drawX * boxSize + 'px;"><svg  height="' + boxSize + '" width="' + boxSize + '">\n' +
-                                '  <circle cx="' + boxSize / 2 + '" cy="' + boxSize / 2 + '" r="' + boxSize / 10 * 3 + '" fill="gray" fill-opacity="0.6"/>\n' +
-                                '</svg></div>')
+                            onClickText = 'pieceMove(' + location[0] + ', ' + location[1] + ', true, \'castle\')'
                         }
                     }
                 } else {
                     //check if the king is in check
                     if (!inCheck(newBoard, clickedPiece.team)) {
-                        valid_positions.append(' <div onclick="pieceMove(' + location[0] + ', ' + location[1] + ')" ondrop="drop()" class="valid_position" style="top: ' + drawY * boxSize + 'px; left: ' + drawX * boxSize + 'px;"><svg  height="' + boxSize + '" width="' + boxSize + '">\n' +
-                            '  <circle cx="' + boxSize / 2 + '" cy="' + boxSize / 2 + '" r="' + boxSize / 10 * 3 + '" fill="gray" fill-opacity="0.6"/>\n' +
-                            '</svg></div>')
+                        onClickText = 'pieceMove(' + location[0] + ', ' + location[1] + ')'
                     }
                 }
+                if (onClickText !== null)
+                    valid_positions.append(`<validpos onclick="${onClickText}" draggable="false" style="transform: translate(${drawX * boxSize}px, ${drawY * boxSize}px);"></validpos>`)
+                //`<highlightedtile draggable="false" class="piece_moved_${moveType}" style="transform: translate(${(!flipBoard) ? (pieceMoved[0] * boxSize) + 'px, ' + (pieceMoved[1] * boxSize) : ((7 - pieceMoved[0]) * boxSize) + 'px, ' + ((7 - pieceMoved[1]) * boxSize)}px);"></highlightedtile>`
             })
         }
     }
@@ -559,14 +557,14 @@ function pieceMove(xVal, yVal, specialCase = false, type = "enpassant") {
         $("piecePromote").remove()
         let pieceCodes = ['ql', 'rl', 'bl', 'nl']
         for (let idx = 0; idx < pieceCodes.length; idx++) 
-            piecesLayer.append('<piecePromote onclick="promote(' + xVal + ', ' + yVal + ', \'' + pieceCodes[idx] + '\')" draggable="false" class="' + pieceCodes[idx][0] + ' ' + pieceCodes[idx][1] + `" alt="K-L" style="transform: translate(${((idx * 3 / 4) * boxSize) + 'px, ' + (yVal * boxSize)}px);"></piecePromote>`)
+            piecesLayer.append('<piecePromote onclick="promote(' + xVal + ', ' + yVal + ', \'' + pieceCodes[idx] + '\')" draggable="false" class="' + pieceCodes[idx][0] + ' ' + pieceCodes[idx][1] + `" alt="K-L" style="transform: translate(${(!flipBoard) ? ((idx * 3 / 4) * boxSize) + 'px, ' + (yVal * boxSize) : ((idx * 3 / 4) * boxSize) + 'px, ' + ((7 - yVal) * boxSize)}px);"></piecePromote>`)
     }
     else if (yVal === 7 && chessBoard[selectedPiece[1]][selectedPiece[0]].code === 'pd') {
         // show promotion selector light
         $("piecePromote").remove()
         let pieceCodes = ['qd', 'rd', 'bd', 'nd']
         for (let idx = 0; idx < pieceCodes.length; idx++)
-            piecesLayer.append('<piecePromote onclick="promote(' + xVal + ', ' + yVal + ', \'' + pieceCodes[idx] + '\')" draggable="false" class="' + pieceCodes[idx][0] + ' ' + pieceCodes[idx][1] + `" alt="K-L" style="transform: translate(${((idx * 3 / 4) * boxSize) + 'px, ' + (yVal * boxSize)}px);"></piecePromote>`)
+            piecesLayer.append('<piecePromote onclick="promote(' + xVal + ', ' + yVal + ', \'' + pieceCodes[idx] + '\')" draggable="false" class="' + pieceCodes[idx][0] + ' ' + pieceCodes[idx][1] + `" alt="K-L" style="transform: translate(${(!flipBoard) ? ((idx * 3 / 4) * boxSize) + 'px, ' + (yVal * boxSize) : ((idx * 3 / 4) * boxSize) + 'px, ' + ((7 - yVal) * boxSize)}px);"></piecePromote>`)
     } else {
         if (selectedPiece !== null && chessBoard[selectedPiece[1]][selectedPiece[0]] !== 'NA') {
             sendToWs('move', [['startingPos', selectedPiece], ['endingPos', [xVal, yVal]]])
@@ -1002,8 +1000,14 @@ function getVectorsAbsolute(xVal, yVal, vectors, team) {
 }
 
 var ownTeam = null;
+let previousBoardOrientation = false
 
 function drawBoard(board = chessBoard, turnToCheck = null) {
+    finishAnimations()
+    if (animationInterval !== null) {
+        console.log("Cleared Interval")
+        clearInterval(animationInterval)
+    }
     let moveType = "self"
     if ((turnToCheck === null && pieceMoved !== null && board[pieceMoved[1]][pieceMoved[0]].team !== ownTeam) || (turnToCheck !== null && !turnToCheck)) moveType = "other"
     resizeCheck()
@@ -1012,12 +1016,14 @@ function drawBoard(board = chessBoard, turnToCheck = null) {
     for (let y = 0; y < 8; y++)
         for (let x = 0; x < 8; x++) {
             let isDifferent = false;
-            if (board[y][x] === 'NA' && reDrawBoard[y][x] !== 'NA') isDifferent = true
-            if (board[y][x] !== 'NA' && reDrawBoard[y][x] === 'NA') isDifferent = true
-            if (board[y][x] !== 'NA' && reDrawBoard[y][x] !== 'NA' && board[y][x].code !== reDrawBoard[y][x].code) isDifferent = true
-            if (isDifferent) {
-                if (board[y][x] !== 'NA') needPieces.push([x, y])
-                if (reDrawBoard[y][x] !== 'NA') extraPieces.push([x, y])
+            const newBoardPos = board[y][x]
+            const oldBoardPos = reDrawBoard[y][x]
+            if (newBoardPos === 'NA' && oldBoardPos !== 'NA') isDifferent = true
+            if (newBoardPos !== 'NA' && oldBoardPos === 'NA') isDifferent = true
+            if (newBoardPos !== 'NA' && oldBoardPos !== 'NA' && newBoardPos.code !== oldBoardPos.code) isDifferent = true
+            if (isDifferent || (previousBoardOrientation !== flipBoard)) {
+                if (newBoardPos !== 'NA') needPieces.push([x, y])
+                if (oldBoardPos !== 'NA') extraPieces.push([x, y])
             }
         }
 
@@ -1030,13 +1036,25 @@ function drawBoard(board = chessBoard, turnToCheck = null) {
         for (let j = 0; j < extraPieces.length; j++) {
             const extraPieceCode = reDrawBoard[extraPieces[j][1]][extraPieces[j][0]].code
             if (extraPieceCode === pieceCode) {
-                piecesToTranslate.push({"elem": $("#piece" + extraPieces[j][0] + extraPieces[j][1]), "translateText": `translate(${(!flipBoard) ? (needPiecePos[0] * boxSize) + 'px, ' + (needPiecePos[1] * boxSize) : ((7 - needPiecePos[0]) * boxSize) + 'px, ' + ((7 - needPiecePos[1]) * boxSize)}px)`, "newId": 'piece' + needPiecePos[0] + needPiecePos[1], "onClickPos": needPiecePos[0] + ', ' + needPiecePos[1]})
+                piecesToTranslate.push({
+                    "elem": $("#piece" + extraPieces[j][0] + extraPieces[j][1]),
+                    "startingPos": ((previousBoardOrientation !== flipBoard && flipBoard) || (previousBoardOrientation === flipBoard && !flipBoard)) ? [(extraPieces[j][0] * boxSize), (extraPieces[j][1] * boxSize)] : [((7 - extraPieces[j][0]) * boxSize), ((7 - extraPieces[j][1]) * boxSize)],
+                    "endingPos": (!flipBoard) ? [(needPiecePos[0] * boxSize), (needPiecePos[1] * boxSize)] : [((7 - needPiecePos[0]) * boxSize), ((7 - needPiecePos[1]) * boxSize)],
+                    "newId": 'piece' + needPiecePos[0] + needPiecePos[1],
+                    "onClickPos": needPiecePos[0] + ', ' + needPiecePos[1],
+                    "frame": 0
+                })
                 foundPieceToMove = true
                 extraPieces.splice(j, 1)
                 break;
             }
         }
-        if (!foundPieceToMove) piecesToAdd.push('<piece class="' + pieceCode[0] + ' ' + pieceCode[1] + '" id="piece' + needPiecePos[0] + needPiecePos[1] + '" onclick="pieceClicked(' + needPiecePos[0] + ', ' + needPiecePos[1] + `)" draggable="false" style="transform: translate(${(!flipBoard) ? (needPiecePos[0] * boxSize) + 'px, ' + (needPiecePos[1] * boxSize) : ((7 - needPiecePos[0]) * boxSize) + 'px, ' + ((7 - needPiecePos[1]) * boxSize)}px);"></piece`)
+        if (!foundPieceToMove) piecesToAdd.push('<piece class="' +
+            pieceCode[0] + ' ' + pieceCode[1] + '" id="piece' + 
+            needPiecePos[0] + needPiecePos[1] + 
+            '" onclick="pieceClicked(' + needPiecePos[0] + ', ' + needPiecePos[1] + 
+            `)" draggable="false" style="transform: translate(${(!flipBoard) ? (needPiecePos[0] * boxSize) + 'px, ' + (needPiecePos[1] * boxSize) :
+            ((7 - needPiecePos[0]) * boxSize) + 'px, ' + ((7 - needPiecePos[1]) * boxSize)}px);"></piece`)
     }
     for (let i = 0; i < extraPieces.length; i++) {
         const pieceToDelete = $("#piece" + extraPieces[i][0] + extraPieces[i][1])
@@ -1044,24 +1062,26 @@ function drawBoard(board = chessBoard, turnToCheck = null) {
     }
 
     piecesToTranslate.forEach(pieceToTranslate => {
-        pieceToTranslate.elem.css("transform", pieceToTranslate.translateText)
         pieceToTranslate.elem.attr('id', pieceToTranslate.newId)
         pieceToTranslate.elem.attr('onclick', `pieceClicked(${pieceToTranslate.onClickPos})`)
     })
 
+    animations = piecesToTranslate
+
     piecesToAdd.forEach(pieceToAdd => {
         piecesLayer.append(pieceToAdd)
     })
-    $('oldpos').remove()
-    $('piece').removeClass('piece_moved_self piece_moved_other')
+    $('highlightedtile').remove()
+    // $('piece').removeClass('piece_moved_self piece_moved_other')
     if (pieceMoved !== null) {
-        $("#piece" + pieceMoved[0] + pieceMoved[1]).addClass("piece_moved_" + moveType)
-        if (!flipBoard)
-            piecesLayer.append(`<oldpos draggable="false" class="previous_place_${moveType}" style="transform: translate(${(oldPos[0] * boxSize) + 'px, ' + (oldPos[1] * boxSize)}px);"></oldpos>`)
-        else
-            piecesLayer.append(`<oldpos draggable="false" class="previous_place_${moveType}" style="transform: translate(${((7 - oldPos[0]) * boxSize) + 'px, ' + ((7 - oldPos[1]) * boxSize)}px);"></oldpos>`)
+        // $("#piece" + pieceMoved[0] + pieceMoved[1]).addClass("piece_moved_" + moveType)
+        piecesLayer.append(`<highlightedtile draggable="false" class="previous_place_${moveType}" style="transform: translate(${(!flipBoard) ? (oldPos[0] * boxSize) + 'px, ' + (oldPos[1] * boxSize) : ((7 - oldPos[0]) * boxSize) + 'px, ' + ((7 - oldPos[1]) * boxSize)}px);"></highlightedtile>`)
+        piecesLayer.append(`<highlightedtile draggable="false" class="piece_moved_${moveType}" style="transform: translate(${(!flipBoard) ? (pieceMoved[0] * boxSize) + 'px, ' + (pieceMoved[1] * boxSize) : ((7 - pieceMoved[0]) * boxSize) + 'px, ' + ((7 - pieceMoved[1]) * boxSize)}px);"></highlightedtile>`)
     }
     reDrawBoard = clone(board)
+    animationInterval = setInterval(updateAnimations, 10)
+    previousBoardOrientation = flipBoard
+    console.log("Drawn Board")
 }
 
 

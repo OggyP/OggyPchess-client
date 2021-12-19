@@ -11,14 +11,8 @@
     background-image: url('/resources/svg/chessBoards/brownBoard.svg');
 }
 
-#pieces_layer {
-    position: relative;
-}
-
-#valid_positions {
-    position: relative;
-}
-
+#pieces_layer,
+#valid_positions,
 #promotion_selector {
     position: absolute;
 }
@@ -50,8 +44,9 @@ th {
 }
 
 piece,
-oldpos,
-piecePromote {
+highlightedtile,
+piecePromote,
+validpos {
     position: absolute;
     top: 0;
     left: 0;
@@ -60,12 +55,24 @@ piecePromote {
 }
 
 piece,
-oldpos {
+highlightedtile,
+validpos {
     width: 12.5%;
     height: 12.5%;
+}
+
+highlightedtile {
     z-index: 2;
 }
 
+piece {
+    z-index: 3;
+}
+
+validpos {
+    background-image: url('/resources/svg/validPos/validPos.svg');
+    z-index: 4;
+}
 
 piecePromote {
     width: 9.375%;

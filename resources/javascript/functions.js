@@ -59,6 +59,14 @@ function resizeCheck() {
     chessBoardDiv.height(minSize)
     piecesDiv.width(minSize)
     piecesDiv.height(minSize)
+    valid_positions.width(minSize)
+    valid_positions.height(minSize)
+    if (boxSize !== minSize / 8) {
+        $('piece').each(function() {
+            let currentElement = $(this)
+            console.log(currentElement.id)
+        })
+    }
     boxSize = minSize / 8
     return minSize
     // let chessPiece = $(".chess_piece")
@@ -220,6 +228,36 @@ function FENtoGame(FEN) {
     return startingBoard
 }
 
+var animationInterval = null
+var animations = [] // {elem, frames (out of 20), startingPos, endingPos}
+
+function updateAnimations() {
+    // console.log("ran update animations")
+    console.log(animations)
+    for (let i = 0; i < animations.length; i++) {
+        let currentAnimation = animations[i]
+        currentAnimation.frame++
+        if (currentAnimation.frame <= 20) {
+            let wayThroughAnimation = currentAnimation.frame / 20
+            currentAnimation.elem.css("transform", `translate(${lerp(currentAnimation.startingPos[0], currentAnimation.endingPos[0], wayThroughAnimation)}px, ${lerp(currentAnimation.startingPos[1], currentAnimation.endingPos[1], wayThroughAnimation)}px)`)
+        } else {
+            animations.splice(i, 1)
+        }
+    }
+    if (animations.length === 0 && animationInterval !== null) {
+        console.log("Cleared Interval")
+        clearInterval(animationInterval)
+    }
+}
+
+function finishAnimations() {
+    for (let i = 0; i < animations.length; i++) {
+        let currentAnimation = animations[i]
+        currentAnimation.elem.css("transform", `translate(${currentAnimation.endingPos[0]}px, ${currentAnimation.endingPos[1]}px)`)
+    }
+    animations = []
+}
+
 function gameOver(data) {
     mode = "gameOver"
     $('#reset_game').show()
@@ -333,6 +371,10 @@ function getCookie(cname) {
         }
     }
     return "";
+}
+
+function lerp(a, b, n) {
+    return (1 - n) * a + n * b;
 }
 
 function openHomeMenu(button, menu) {
