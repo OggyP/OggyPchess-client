@@ -4,6 +4,7 @@ const piecesLayer = $("#pieces_layer");
 const moveList = $("#move_list")
 const PGNView = $("#PGN_view")
 const openingDisplay = $("#opening")
+const FENdisplay = $("#fen_display")
 let selectedPiece = null;
 let moveNum = 0
 let fiftyMoveRuleCountDown = 50
@@ -447,7 +448,7 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
             }
         })
         showingBoard = moveNum
-        drawBoard(chessBoard, !turn)
+        drawBoard(chessBoard, moveNum, !turn)
     }
     catch (e) {
         console.log(e)
@@ -904,11 +905,11 @@ function goToMove(moveNumber) {
 
     if (oldPos !== null) {
         if (ownTeam === null)
-            drawBoard(boardSelected.board, boardSelected.board[boardSelected.endingPos[1]][boardSelected.endingPos[0]].team)
+            drawBoard(boardSelected.board, showingBoard, boardSelected.board[boardSelected.endingPos[1]][boardSelected.endingPos[0]].team)
         else
-            drawBoard(boardSelected.board)
+            drawBoard(boardSelected.board, showingBoard)
     } else {
-        drawBoard(boardSelected.board)
+        drawBoard(boardSelected.board, showingBoard)
     }
 
     $("#resume_game").show()
@@ -1003,13 +1004,12 @@ function getVectorsAbsolute(xVal, yVal, vectors, team) {
 var ownTeam = null;
 let previousBoardOrientation = false
 var lastMoveType = 'self'
+var lastMoveNum = 0
 
-function drawBoard(board = chessBoard, turnToCheck = null) {
+function drawBoard(board = chessBoard, moveNumber = moveNum, turnToCheck = null) {
     finishAnimations()
-    if (animationInterval !== null) {
-        console.log("Cleared Interval")
+    if (animationInterval !== null)
         clearInterval(animationInterval)
-    }
     let moveType = "self"
     if ((turnToCheck === null && pieceMoved !== null && board[pieceMoved[1]][pieceMoved[0]].team !== ownTeam) || (turnToCheck !== null && !turnToCheck)) moveType = "other"
     // resizeCheck()
@@ -1084,7 +1084,14 @@ function drawBoard(board = chessBoard, turnToCheck = null) {
     animationInterval = setInterval(updateAnimations, 10)
     previousBoardOrientation = flipBoard
     lastMoveType = moveType
-    console.log("Drawn Board")
+    lastMoveNum = moveNumber
+    if (pieceMoved !== null) {
+        FENdisplay.text(getFENofBoard(board, board[pieceMoved[1]][pieceMoved[0]].team, moveNumber, 0, chessMode === 'standard'))
+    } else {
+        console.log(getFENofBoard(board, true, moveNumber, 0, chessMode === 'standard'))
+        FENdisplay.text(getFENofBoard(board, true, moveNumber, 0, chessMode === 'standard'))
+    }
+
 }
 
 

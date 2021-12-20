@@ -288,7 +288,8 @@ if (isset($_GET['assets'])) {
             </div>
             <div id="options">
                 <h4 id="opening" class="opening">Starting Position</h4>
-                <button onclick="flipBoard = !flipBoard; drawBoard(reDrawBoard); valid_positions.empty()">Flip Board</button>
+                <h5 id="fen_display" class="opening">FEN Value</h5>
+                <button onclick="flipBoard = !flipBoard; drawBoard(reDrawBoard, lastMoveNum); valid_positions.empty()">Flip Board</button>
                 <button id="resume_game" onclick="drawCurrentBoard = true; drawBoard(); $('#resume_game').hide()" style="display: none;">Resume</button>
                 <button onclick="download('game.pgn')" class="download_pgn">Download PGN</button>
                 <button id="reset_game" onclick="resetGame()" style="display: none;">Go Home</button>

@@ -2,13 +2,11 @@
 window.addEventListener("keydown", function (event) {
     if (mode === "login") {
         if (event.key === "Enter") {
-            console.log("Enter Pressed")
             login()
         }
     }
     else if (mode === "register") {
         if (event.key === "Enter") {
-            console.log("Enter Pressed")
             register()
         }
     }
@@ -45,7 +43,6 @@ window.addEventListener("keydown", function (event) {
     }
 
     if (event.key === "ArrowRight") {
-        console.log(showingBoard)
         if (!drawCurrentBoard) {
             showingBoard ++
             if (showingBoard === moveNum) {
@@ -53,7 +50,7 @@ window.addEventListener("keydown", function (event) {
                 oldPos = boardAtMove[moveNum].startPos
                 pieceMoved = boardAtMove[moveNum].endingPos
                 if (ownTeam === null)
-                    drawBoard(chessBoard, boardAtMove[moveNum].board[boardAtMove[moveNum].endingPos[1]][boardAtMove[moveNum].endingPos[0]].team)
+                    drawBoard(chessBoard, showingBoard, boardAtMove[moveNum].board[boardAtMove[moveNum].endingPos[1]][boardAtMove[moveNum].endingPos[0]].team)
                 else
                     drawBoard()
                 $('#resume_game').hide()

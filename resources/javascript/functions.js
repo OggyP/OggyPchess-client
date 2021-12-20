@@ -206,6 +206,60 @@ function formatDate(timestamp) {
     return date[2] + " " + day;
 }
 
+function getFENofBoard(chessboard, turn, moveNum, fiftyMoveRuleCountDown, allowCasting) {
+    let FEN = ""
+    for (let i = 0; i < 8; i++) {
+        let emptySpaceCount = 0;
+        for (let j = 0; j < 8; j++) {
+            if (chessboard[i][j] !== 'NA') {
+                let pieceFENcode = (chessboard[i][j].team) ? chessboard[i][j].piece.toUpperCase() : chessboard[i][j].piece;
+                if (emptySpaceCount > 0) {
+                    FEN += emptySpaceCount.toString()
+                }
+                FEN += pieceFENcode
+                emptySpaceCount = 0
+            } else {
+                emptySpaceCount++
+            }
+        }
+        if (emptySpaceCount > 0) {
+            FEN += emptySpaceCount.toString()
+        }
+        FEN += "/"
+    }
+    FEN = FEN.slice(0, -1) // Remove excess '/'
+    FEN += ' ' + ((!turn) ? 'w' : 'b') // current move
+    if (allowCasting) {
+        FEN += ' '
+        castlingToAdd = ''
+        castlingToAdd += (chessboard[7][4] !== "NA" && chessboard[7][4].moves === 0 && chessboard[7][4].piece === 'k' && chessboard[7][7] !== "NA" && chessboard[7][7].moves === 0) ? 'K' : '';
+        castlingToAdd += (chessboard[7][4] !== "NA" && chessboard[7][4].moves === 0 && chessboard[7][4].piece === 'k' && chessboard[7][0] !== "NA" && chessboard[7][0].moves === 0) ? 'Q' : '';
+        castlingToAdd += (chessboard[0][4] !== "NA" && chessboard[0][4].moves === 0 && chessboard[0][4].piece === 'k' && chessboard[0][7] !== "NA" && chessboard[0][7].moves === 0) ? 'k' : '';
+        castlingToAdd += (chessboard[0][4] !== "NA" && chessboard[0][4].moves === 0 && chessboard[0][4].piece === 'k' && chessboard[0][0] !== "NA" && chessboard[0][0].moves === 0) ? 'q' : '';
+        if (castlingToAdd.length === 0) castlingToAdd = '-'
+        FEN += castlingToAdd
+    }
+    else {
+        FEN += ' -'
+    }
+    let canEnpassant = false
+    let yValToCheck = (!turn) ? 3 : 4;
+    for (let x = 0; x < 8; x++) {
+        if (chessboard[yValToCheck][x] !== "NA" && chessboard[yValToCheck][x].piece === 'p' && chessboard[yValToCheck][x].moves === 1 && chessboard[yValToCheck][x].lastMoveNum === moveNum - 1) {
+            canEnpassant = true
+            if (!turn)
+                FEN += " " + toChessNotation.x[x] + toChessNotation.y[yValToCheck - 1]
+            else
+                FEN += " " + toChessNotation.x[x] + toChessNotation.y[yValToCheck + 1]
+            break;
+        }
+    }
+    if (!canEnpassant) FEN += ' -' // enpassant
+    FEN += ` ${fiftyMoveRuleCountDown} ${1 + (Math.floor(moveNum / 2))}` // moves played
+    return FEN
+}
+
+
 function FENtoGame(FEN) {
     let startingBoard = []
     let FENparts = FEN.split(' ')
@@ -244,7 +298,6 @@ var animations = [] // {elem, frames (out of 20), startingPos, endingPos}
 
 function updateAnimations() {
     // console.log("ran update animations")
-    console.log(animations)
     for (let i = 0; i < animations.length; i++) {
         let currentAnimation = animations[i]
         currentAnimation.frame++
@@ -256,7 +309,6 @@ function updateAnimations() {
         }
     }
     if (animations.length === 0 && animationInterval !== null) {
-        console.log("Cleared Interval")
         clearInterval(animationInterval)
     }
 }
