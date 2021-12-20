@@ -19,7 +19,13 @@ let pieceMoved = null
 let oldPos = null
 let importedPGN = false
 
-let gavinAudio = new Audio('/resources/audio/gavinCheck.mp3')
+let audio = {
+    "check": new Audio('/resources/audio/gavinCheck.mp3'),
+    "move": new Audio('/resources/audio/move.wav'),
+    "capture": new Audio('/resources/audio/capture.wav')
+}
+
+audio.check.pl
 
 const startingPos = [
     ["rd", "nd", "bd", "qd", "kd", "bd", "nd", "rd"],
@@ -142,6 +148,8 @@ function reveivedMove(event) {
         $("piece").css("opacity", "1")
         pieceMoved = event.data.endingPos
         oldPos = event.data.startingPos
+        let audioToPlay = "move"
+        if (chessBoard[event.data.endingPos[1]][event.data.endingPos[0]] !== 'NA') audioToPlay = "capture"
         if (turn) fiftyMoveRuleCountDown--
         chessBoard[event.data.startingPos[1]][event.data.startingPos[0]].moves++;
         chessBoard[event.data.startingPos[1]][event.data.startingPos[0]].lastMoveNum = moveNum;
@@ -192,10 +200,11 @@ function reveivedMove(event) {
             appendToMove("+")
         }
         if (ownTeam === !turn && inCheck(chessBoard, !turn)) {
-            gavinAudio.play()
+            audio.check.play()
         }
+        audio[audioToPlay].play()
         turn = !turn
-        boardAtMove.push({'board': clone(chessBoard), 'startPos': event.data.startingPos, 'endingPos': event.data.endingPos})
+        boardAtMove.push({'board': clone(chessBoard), 'startPos': event.data.startingPos, 'endingPos': event.data.endingPos, 'audio': audioToPlay})
         moveNum++;
     }
     if (moveNum < 30) {
@@ -292,6 +301,7 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
                 let originalMove = move
                 let promoteChoice = false
                 let isCheckMate = move.includes('#')
+                let isCapture = move.includes('x')
                 move = move.replace('x', '').replace('+', '').replace('#', '')
                 move = move.split('=')
                 if (move.length === 2) promoteChoice = move[1]
@@ -444,7 +454,9 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
                 moveNum++
                 oldPos = startingPos
                 pieceMoved = endingPos
-                boardAtMove.push({'board': clone(chessBoard), 'startPos': startingPos, 'endingPos': endingPos})
+                let audioToPlay = 'move'
+                if (isCapture) audioToPlay = 'capture'
+                boardAtMove.push({'board': clone(chessBoard), 'startPos': startingPos, 'endingPos': endingPos, 'audio': audioToPlay})
             }
         })
         showingBoard = moveNum
@@ -905,6 +917,11 @@ function goToMove(moveNumber) {
     else
         pieceMoved = null
 
+    if (lastMoveNum + 1 === moveNumber && boardSelected.hasOwnProperty('audio')) {
+        let audioToPlay = audio[boardSelected.audio]
+        audioToPlay.currentTime = 0
+        audioToPlay.play()
+    }
     if (oldPos !== null) {
         if (ownTeam === null)
             drawBoard(boardSelected.board, showingBoard, boardSelected.board[boardSelected.endingPos[1]][boardSelected.endingPos[0]].team)
@@ -913,7 +930,7 @@ function goToMove(moveNumber) {
     } else {
         drawBoard(boardSelected.board, showingBoard)
     }
-
+    
     $("#resume_game").show()
 }
 
