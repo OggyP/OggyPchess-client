@@ -61,6 +61,7 @@ if (isset($_GET['assets'])) {
     <meta name="author" content="Oscar Pritchard, Kaelan Carlos, Ewan Odenthal">
     <meta name="theme-color" content="#ffffff">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta property="og:title" content="<?php if ($isViewingGame) {echo $gameInfo['white'] . " vs " . $gameInfo['black'];} else {echo "OggyP Chess";} ?>">
     <meta property="og:description" content="<?php if ($isViewingGame) {echo $gameInfo['score'] . " " . $gameInfo['reason'] . "\n" . $gameInfo['opening'] . "\n" . $pgnVal;} else {echo "Play the highly popular game, chess but with mandatory enpassant! (It is a feature)";} ?>">
     <meta name="description" content="
@@ -290,7 +291,8 @@ if (isset($_GET['assets'])) {
                 <h4 id="opening" class="opening">Starting Position</h4>
                 <h5 id="fen_display" class="opening">FEN Value</h5>
                 <button onclick="flipBoard = !flipBoard; drawBoard(reDrawBoard, lastMoveNum); valid_positions.empty()">Flip Board</button>
-                <button id="resume_game" onclick="drawCurrentBoard = true; drawBoard(); $('#resume_game').hide()" style="display: none;">Resume</button>
+                <button id="resume_game" onclick="drawCurrentBoard = true; showingBoard = moveNum; drawBoard(); $('#resume_game').hide()" style="display: none;">Resume</button>
+                <button id="stop_stop_animation" onclick="startPlayAnimation()">Play</button>
                 <button onclick="download('game.pgn')" class="download_pgn">Download PGN</button>
                 <button id="reset_game" onclick="resetGame()" style="display: none;">Go Home</button>
                 <button id="share_game" onclick="copyURLToClipboard()" style="display: none;">Share</button>

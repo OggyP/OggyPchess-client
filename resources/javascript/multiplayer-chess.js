@@ -890,6 +890,8 @@ function appendMoveToList(startingPos, newPosition, isEnpassant, timerInfo, prom
 }
 
 function goToMove(moveNumber) {
+    $("piece").css("opacity", "1")
+    valid_positions.empty()
     showingBoard = moveNumber
     drawCurrentBoard = (moveNum === showingBoard);
     let boardSelected = boardAtMove[moveNumber]

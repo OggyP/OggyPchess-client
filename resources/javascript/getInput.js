@@ -40,6 +40,7 @@ window.addEventListener("keydown", function (event) {
     if (event.key === "ArrowUp") {
         showingBoard = moveNum
         goToMove(showingBoard)
+        $('#resume_game').hide()
     }
 
     if (event.key === "ArrowRight") {

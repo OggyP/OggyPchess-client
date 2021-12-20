@@ -293,6 +293,46 @@ function FENtoGame(FEN) {
     return startingBoard
 }
 
+const playStopAnimationButton = $("#stop_stop_animation")
+var playMovesInterval = null
+function updatePlayAnimation() {
+    if (!drawCurrentBoard) {
+        showingBoard ++
+        if (showingBoard >= moveNum) {
+            showingBoard = moveNum
+            drawCurrentBoard = true;
+            oldPos = boardAtMove[moveNum].startPos
+            pieceMoved = boardAtMove[moveNum].endingPos
+            if (ownTeam === null)
+                drawBoard(chessBoard, showingBoard, boardAtMove[moveNum].board[boardAtMove[moveNum].endingPos[1]][boardAtMove[moveNum].endingPos[0]].team)
+            else
+                drawBoard()
+            $('#resume_game').hide()
+            stopPlayAnimation()
+        } else {
+            goToMove(showingBoard)
+        }
+    } else {
+        stopPlayAnimation()
+    }
+}
+
+function startPlayAnimation() {
+    if (showingBoard === moveNum)
+        showingBoard = 0
+    drawCurrentBoard = false
+    updatePlayAnimation()
+    playMovesInterval = setInterval(updatePlayAnimation, 1000)
+    playStopAnimationButton.text("Stop")
+    playStopAnimationButton.attr("onclick", "stopPlayAnimation()")
+}
+
+function stopPlayAnimation() {
+    clearInterval(playMovesInterval)
+    playStopAnimationButton.text("Play")
+    playStopAnimationButton.attr("onclick", "startPlayAnimation()")
+}
+
 var animationInterval = null
 var animations = [] // {elem, frames (out of 20), startingPos, endingPos}
 
