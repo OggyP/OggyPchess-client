@@ -313,5 +313,26 @@ if (isset($_GET['assets'])) {
     <script src="resources/javascript/getInput.js"></script>
     <script src="resources/javascript/multiplayer-chess.js"></script>
     <script src="resources/javascript/wsHandle.js"></script>
+    <script src="engine.js"></script>
+    <script>
+        (function fix_workers()
+        {
+        var script_tag;
+        /// Does the environment support web workers?  If not, include stockfish.js directly.
+        ///NOTE: Since web workers don't work when a page is loaded from the local system, we have to fake it there too. (Take that security measures!)
+        if (!Worker || (location && location.protocol === "file:")) {
+            var script_tag  = document.createElement("script");
+            script_tag.type ="text/javascript";
+            script_tag.src  = "stockfish.js";
+            script_tag.onload = init;
+            document.getElementsByTagName("head")[0].appendChild(script_tag);
+            wait_for_script = true;
+            setTimeout(function ()
+            {
+            console.warn("Loading this example from the file: protocol will load the slower asm.js engine.\nRun server.js and then load http://localhost:8080/ for the WASM engine.");
+            }, 3000);
+        }
+        }());
+    </script>
 </body>
 </html>
