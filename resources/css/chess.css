@@ -93,6 +93,14 @@ piecePromote {
 	font-family: 'Roboto', sans-serif;
 }
 
+.best_move_start {
+    background-color: #6b007977;
+}
+
+.best_move_end {
+    background-color: #ea4aff77;
+}
+
 .piece_moved_self {
     background-color: #035bff77;
 }

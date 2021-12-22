@@ -38,7 +38,9 @@ function checkForToken() {
     }
 }
 
+var ownUserId = null
 function loginSuccess(data) {
+    ownUserId = data.userId
     if (data.hasOwnProperty("token")) {
         setCookie("token", data.token + "|" + data.userId, 7)
     }

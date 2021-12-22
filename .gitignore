@@ -4,6 +4,3 @@ chess.js
 game.html
 chess.css
 test-os.php
-resources/stockfish/nn-13406b1dcbe0.nnue
-resources/stockfish/stockfish.js
-resources/stockfish/stockfish.wasm

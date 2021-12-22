@@ -1024,6 +1024,7 @@ var ownTeam = null;
 let previousBoardOrientation = false
 var lastMoveType = 'self'
 var lastMoveNum = 0
+var oneSecEngineTimeout = null
 
 function drawBoard(board = chessBoard, moveNumber = moveNum, turnToCheck = null) {
     finishAnimations()
@@ -1104,12 +1105,19 @@ function drawBoard(board = chessBoard, moveNumber = moveNum, turnToCheck = null)
     previousBoardOrientation = flipBoard
     lastMoveType = moveType
     lastMoveNum = moveNumber
+    let fen;
     if (pieceMoved !== null) {
-        FENdisplay.text(getFENofBoard(board, board[pieceMoved[1]][pieceMoved[0]].team, moveNumber, 0, chessMode === 'standard'))
+        fen = getFENofBoard(board, board[pieceMoved[1]][pieceMoved[0]].team, moveNumber, 0, chessMode === 'standard') 
     } else {
-        console.log(getFENofBoard(board, true, moveNumber, 0, chessMode === 'standard'))
-        FENdisplay.text(getFENofBoard(board, true, moveNumber, 0, chessMode === 'standard'))
+        fen = getFENofBoard(board, false, moveNumber, 0, chessMode === 'standard')
     }
+    FENdisplay.text(fen)
+    if (oneSecEngineTimeout !== null) clearTimeout(oneSecEngineTimeout)
+    oneSecEngineTimeout = setTimeout(function() {
+        evaluationTurn = (fen.split(' ')[1] === 'w')
+        if (importedPGN || (ownUserId !== null && ownUserId === 1)) goToDepth(fen, 30)
+        oneSecEngineTimeout = null
+    }, 1000)
 
 }
 

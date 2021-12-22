@@ -68,7 +68,6 @@ function resizeCheck() {
             let piecePos = currentElement.attr('id').replace('piece', '')
             piecePos = [Number(piecePos[0]), Number(piecePos[1])]
             currentElement.css("transform", `translate(${(!flipBoard) ? piecePos[0] * boxSize : (7 - piecePos[0]) * boxSize}px, ${(!flipBoard) ? piecePos[1] * boxSize : (7 - piecePos[1]) * boxSize}px)`)
-            console.log(`translate(${(!flipBoard) ? piecePos[0] * boxSize : (7 - piecePos[0]) * boxSize}px, ${(!flipBoard) ? piecePos[1] * boxSize : (7 - piecePos[1]) * boxSize}px)`)
         })
         $('highlightedtile').remove()
         // $('piece').removeClass('piece_moved_self piece_moved_other')
@@ -103,6 +102,8 @@ function joinQueue() {
 }
 
 function resetGame() {
+    stopSearching()
+    uciCmd("ucinewgame", evaler)
     importedPGN = false
     selectedPiece = null;
     moveNum = 0
@@ -393,6 +394,7 @@ function gameOver(data) {
     let table = $("#previous_games")
     table.prepend(formatOldGame(data.gameListInfo))
     pieceMoved = null
+    stopSearching()
 }
 
 let cachedPGN = {}

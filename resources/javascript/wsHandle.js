@@ -78,6 +78,8 @@ ws.onmessage = function (message) {
             mode = "queue"
         }
         else if (type === 'gameFound') {
+            stopSearching()
+            uciCmd('ucinewgame')
             pieceMoved = null
             timerMoveNum = 0
             previousMoveTime = new Date().getTime()

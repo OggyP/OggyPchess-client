@@ -290,6 +290,7 @@ if (isset($_GET['assets'])) {
             <div id="options">
                 <h4 id="opening" class="opening">Starting Position</h4>
                 <h5 id="fen_display" class="opening">FEN Value</h5>
+                <h5 id="eveluation" class="opening">Engine Evaluation</h5>
                 <button onclick="flipBoard = !flipBoard; drawBoard(reDrawBoard, lastMoveNum); valid_positions.empty()">Flip Board</button>
                 <button id="resume_game" onclick="drawCurrentBoard = true; showingBoard = moveNum; drawBoard(); $('#resume_game').hide()" style="display: none;">Resume</button>
                 <button id="stop_stop_animation" onclick="startPlayAnimation()">Play</button>
@@ -313,7 +314,7 @@ if (isset($_GET['assets'])) {
     <script src="resources/javascript/getInput.js"></script>
     <script src="resources/javascript/multiplayer-chess.js"></script>
     <script src="resources/javascript/wsHandle.js"></script>
-    <script src="engine.js"></script>
+    <script src="resources/stockfish/engine.js"></script>
     <script>
         (function fix_workers()
         {
@@ -323,7 +324,7 @@ if (isset($_GET['assets'])) {
         if (!Worker || (location && location.protocol === "file:")) {
             var script_tag  = document.createElement("script");
             script_tag.type ="text/javascript";
-            script_tag.src  = "stockfish.js";
+            script_tag.src  = "resources/stockfish/stockfish.js";
             script_tag.onload = init;
             document.getElementsByTagName("head")[0].appendChild(script_tag);
             wait_for_script = true;
