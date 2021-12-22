@@ -1,6 +1,7 @@
 /********************
        GENERAL
 ********************/
+
 *,
 *::before,
 *::after {
@@ -10,10 +11,10 @@
 }
 
 
-
 /********************
       HEADINGS
 ********************/
+
 h1,
 h2,
 h3 {
@@ -38,53 +39,47 @@ h4 {
 }
 
 
-
 /********************
    BASIC MARKDOWN
 ********************/
+
 u {
     border-bottom: 1px solid var(--primary);
     text-decoration: none;
 }
 
 
-
-
 /********************
         LINES
 ********************/
+
 hr {
     border: 1px solid var(--primary);
 }
 
 
-
-
 /********************
        BUTTONS
 ********************/
+
 button,
-input + label.button {
+input+label.button {
     background: var(--dark);
     cursor: pointer;
     border: none;
-
     --bdrs: 5px;
     -webkit-border-radius: var(--bdrs);
     -moz-border-radius: var(--bdrs);
     border-radius: var(--bdrs);
-
     padding: 0.4em 0.6em;
     width: auto;
     height: auto;
     display: inline-flex;
     justify-content: center;
     align-items: center;
-
     font-size: 16px;
     font-family: var(--font-1);
     color: var(--txt);
-
     -webkit-transition: 50ms;
     -moz-transition: 50ms;
     -ms-transition: 50ms;
@@ -94,33 +89,29 @@ input + label.button {
 
 button:hover,
 button:focus,
-input + label.button:hover,
-input + label.button:focus {
+input+label.button:hover,
+input+label.button:focus {
     background: var(--grey);
 }
-
-
 
 
 /********************
        INPUTS
 ********************/
+
 input {
     background: none;
     outline: none;
     filter: none;
-
     margin: 10px;
     border: none;
     border-bottom: 1px solid var(--dark);
     padding: 0.5em;
     width: 250px;
     display: inline-block;
-
     font-size: 1rem;
     font-family: var(--font-1);
     color: var(--txt);
-
     --trs: border-bottom-color 50ms;
     -webkit-transition: var(--trs);
     -moz-transition: var(--trs);
@@ -143,10 +134,10 @@ input[hidden] {
 }
 
 
-
 /********************
        TABLES
 ********************/
+
 table {
     font-size: 20px;
 }
@@ -156,10 +147,10 @@ th {
 }
 
 
-
 /********************
        LABELS
 ********************/
-input:checked + label.button {
+
+input:checked+label.button {
     background: var(--primary);
 }

@@ -45,7 +45,7 @@ window.addEventListener("keydown", function (event) {
 
     if (event.key === "ArrowRight") {
         if (!drawCurrentBoard) {
-            showingBoard ++
+            showingBoard++
             if (showingBoard === moveNum) {
                 drawCurrentBoard = true;
                 oldPos = boardAtMove[moveNum].startPos

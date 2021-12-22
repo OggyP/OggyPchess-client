@@ -52,15 +52,15 @@ const emptyBoard = [
 let reDrawBoard = emptyBoard;
 
 let pgnMetaValues = {
-    "Event" : "?",
-    "Site"  : "chess.oggyp.com",
-    "Date"  : new Date().getFullYear() + '.' + new Date().getMonth() + '.' + new Date().getDate(),
-    "Round" : "?",
-    "White" : "?",
-    "Black" : "?",
+    "Event": "?",
+    "Site": "chess.oggyp.com",
+    "Date": new Date().getFullYear() + '.' + new Date().getMonth() + '.' + new Date().getDate(),
+    "Round": "?",
+    "White": "?",
+    "Black": "?",
     "Result": "*",
-    "Mode"  : "normal",
-    "FEN" : ""
+    "Mode": "normal",
+    "FEN": ""
 }
 let pgnMeta = ["Event", "Site", "Date", "Round", "White", "Black", "Result", "Mode", "FEN"]
 let pgnText = ""
@@ -106,14 +106,14 @@ const toChessNotation = {
 
 const fromChessNotation = {
     x: {
-        'a' : 0,
-        'b' : 1,
-        'c' : 2,
-        'd' : 3,
-        'e' : 4,
-        'f' : 5,
-        'g' : 6,
-        'h' : 7
+        'a': 0,
+        'b': 1,
+        'c': 2,
+        'd': 3,
+        'e': 4,
+        'f': 5,
+        'g': 6,
+        'h': 7
     },
     y: {
         '8': 0,
@@ -142,8 +142,10 @@ function reveivedMove(event) {
     timers.whiteTimer.timerStartTime = new Date().getTime()
     timers.blackTimer.timerStartTime = new Date().getTime()
     previousMoveTime = new Date().getTime()
-    if (timers.whiteTimer.isCountingDown && ownTeam) $('#white_timer_text').addClass('green_background'); else $('#white_timer_text').removeClass('green_background');
-    if (timers.blackTimer.isCountingDown && !ownTeam) $('#black_timer_text').addClass('green_background'); else $('#black_timer_text').removeClass('green_background');
+    if (timers.whiteTimer.isCountingDown && ownTeam) $('#white_timer_text').addClass('green_background');
+    else $('#white_timer_text').removeClass('green_background');
+    if (timers.blackTimer.isCountingDown && !ownTeam) $('#black_timer_text').addClass('green_background');
+    else $('#black_timer_text').removeClass('green_background');
     if (chessBoard[event.data.startingPos[1]][event.data.startingPos[0]] !== 'NA') {
         $("piece").css("opacity", "1")
         pieceMoved = event.data.endingPos
@@ -151,7 +153,7 @@ function reveivedMove(event) {
         let audioToPlay = "move"
         if (chessBoard[event.data.endingPos[1]][event.data.endingPos[0]] !== 'NA') audioToPlay = "capture"
         if (turn) fiftyMoveRuleCountDown--
-        chessBoard[event.data.startingPos[1]][event.data.startingPos[0]].moves++;
+            chessBoard[event.data.startingPos[1]][event.data.startingPos[0]].moves++;
         chessBoard[event.data.startingPos[1]][event.data.startingPos[0]].lastMoveNum = moveNum;
         if (event.data.hasOwnProperty('promote')) {
             appendMoveToList(event.data.startingPos, event.data.endingPos, false, event.data.timer, event.data.promote)
@@ -195,7 +197,7 @@ function reveivedMove(event) {
         }
         valid_positions.empty();
         drawBoard()
-        // if other team in checkmate
+            // if other team in checkmate
         if (!checkIfGameOver() && inCheck(chessBoard, !turn)) {
             appendToMove("+")
         }
@@ -204,7 +206,7 @@ function reveivedMove(event) {
         }
         audio[audioToPlay].play()
         turn = !turn
-        boardAtMove.push({'board': clone(chessBoard), 'startPos': event.data.startingPos, 'endingPos': event.data.endingPos, 'audio': audioToPlay})
+        boardAtMove.push({ 'board': clone(chessBoard), 'startPos': event.data.startingPos, 'endingPos': event.data.endingPos, 'audio': audioToPlay })
         moveNum++;
     }
     if (moveNum < 30) {
@@ -222,7 +224,7 @@ function reveivedMove(event) {
     if (forcedEnpassant && turn === ownTeam) {
         for (let y = 0; y < 8; y++) {
             for (let x = 0; x < 8; x++) {
-                if (chessBoard[y][x] !== "NA" && chessBoard[y][x].team === ownTeam  && chessBoard[y][x].piece === 'p') {
+                if (chessBoard[y][x] !== "NA" && chessBoard[y][x].team === ownTeam && chessBoard[y][x].piece === 'p') {
                     let locations = movesOfPiece(x, y, chessBoard[y][x])
                     for (let i = 0; i < locations.length; i++) {
                         if (locations[i].length === 3 && locations[i][2]) {
@@ -231,7 +233,10 @@ function reveivedMove(event) {
                             newBoard[y][x] = "NA"
                             newBoard[y][locations[i][0]] = "NA"
                             if (!inCheck(newBoard, ownTeam)) {
-                                sendToWs('move', [['startingPos', [x, y]], ['endingPos', [locations[i][0], locations[i][1]]]])
+                                sendToWs('move', [
+                                    ['startingPos', [x, y]],
+                                    ['endingPos', [locations[i][0], locations[i][1]]]
+                                ])
                             }
                         }
                     }
@@ -262,7 +267,7 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
         let pgnValues = ""
         for (let i = 0; i < lines.length; i++) {
             if (lines[i][0] !== '[' && lines[i] !== '') {
-                pgnValues +=  lines[i] + " "
+                pgnValues += lines[i] + " "
             }
         }
         pgnValues = pgnValues.slice(0, -1);
@@ -272,7 +277,7 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
                 PGNMeta[line.split(' ')[0].slice(1)] = line.split('"')[1]
             }
         })
-        
+
         pgnValues = pgnValues.split(" ")
         if (PGNMeta.hasOwnProperty('FEN')) {
             // Custom starting positions
@@ -289,7 +294,7 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
         if (PGNMeta.hasOwnProperty('White')) $("#white_player").text((PGNMeta['White'].length > 18) ? PGNMeta['White'].slice(0, 15) + "..." : PGNMeta['White'])
         if (PGNMeta.hasOwnProperty('Black')) $("#black_player").text((PGNMeta['Black'].length > 18) ? PGNMeta['Black'].slice(0, 15) + "..." : PGNMeta['Black'])
         $('#in_game_options').hide()
-        boardAtMove.push({'board': clone(chessBoard)})
+        boardAtMove.push({ 'board': clone(chessBoard) })
         drawCurrentBoard = false
         importedPGN = true
         let pgnMoves = ""
@@ -310,7 +315,7 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
                 let endingPos
                 if (move === 'O-O') {
                     let castleYval = (turn) ? 7 : 0
-                    // castle king side (right)
+                        // castle king side (right)
                     if (legalMovesOfPiece([4, castleYval], [6, castleYval])[0] === 'castle') {
                         startingPos = [4, castleYval]
                         endingPos = [6, castleYval]
@@ -331,14 +336,14 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
                     if (legalMovesOfPiece([4, castleYval], [2, castleYval])[0] === 'castle') {
                         startingPos = [4, castleYval]
                         endingPos = [2, castleYval]
-                        chessBoard[castleYval][0].moves++;                              // rook
-                        chessBoard[castleYval][0].lastMoveNum = moveNum;                // rook
-                        chessBoard[castleYval][4].moves++;                              // king
-                        chessBoard[castleYval][4].lastMoveNum = moveNum;                // king
-                        chessBoard[castleYval][3] = clone(chessBoard[castleYval][0])    // move rook
-                        chessBoard[castleYval][2] = clone(chessBoard[castleYval][4])    // move king
-                        chessBoard[castleYval][4] = 'NA'                                // delete king from old pos
-                        chessBoard[castleYval][0] = 'NA'                                // delete rook from old pos
+                        chessBoard[castleYval][0].moves++; // rook
+                        chessBoard[castleYval][0].lastMoveNum = moveNum; // rook
+                        chessBoard[castleYval][4].moves++; // king
+                        chessBoard[castleYval][4].lastMoveNum = moveNum; // king
+                        chessBoard[castleYval][3] = clone(chessBoard[castleYval][0]) // move rook
+                        chessBoard[castleYval][2] = clone(chessBoard[castleYval][4]) // move king
+                        chessBoard[castleYval][4] = 'NA' // delete king from old pos
+                        chessBoard[castleYval][0] = 'NA' // delete rook from old pos
                     } else {
                         displayError('Invalid PGN Castle Queen Side', 'Error at internal move number ' + moveNum + ', ' + originalMove)
                     }
@@ -456,13 +461,12 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
                 pieceMoved = endingPos
                 let audioToPlay = 'move'
                 if (isCapture) audioToPlay = 'capture'
-                boardAtMove.push({'board': clone(chessBoard), 'startPos': startingPos, 'endingPos': endingPos, 'audio': audioToPlay})
+                boardAtMove.push({ 'board': clone(chessBoard), 'startPos': startingPos, 'endingPos': endingPos, 'audio': audioToPlay })
             }
         })
         showingBoard = moveNum
         drawBoard(chessBoard, moveNum, !turn)
-    }
-    catch (e) {
+    } catch (e) {
         console.log(e)
         displayError('PGN Invalid', 'JS Error: ' + e.toString())
     }
@@ -483,10 +487,10 @@ function legalMovesOfPiece(startingPos, endingPos) {
                 if (locations[i][2]) {
                     //check if the king is in check
                     newBoard[startingPos[1]][locations[i][0]] = "NA"
-                    // ENPASSANT
+                        // ENPASSANT
                     if (!inCheck(newBoard, clickedPiece.team)) {
                         return ['enpassant', newBoard, true]
-                        // third value is if 50 move rule should be reset
+                            // third value is if 50 move rule should be reset
                     }
                 } else {
                     // castle (already check for in check)
@@ -529,7 +533,7 @@ function pieceClicked(xVal, yVal) {
                     if (location[2]) {
                         //check if the king is in check
                         newBoard[yVal][location[0]] = "NA"
-                        // ENPASSANT
+                            // ENPASSANT
                         if (!inCheck(newBoard, clickedPiece.team)) {
                             onClickText = 'pieceMove(' + location[0] + ', ' + location[1] + ', true)'
                         }
@@ -547,7 +551,7 @@ function pieceClicked(xVal, yVal) {
                 }
                 if (onClickText !== null)
                     valid_positions.append(`<validpos onclick="${onClickText}" draggable="false" style="transform: translate(${drawX * boxSize}px, ${drawY * boxSize}px);"></validpos>`)
-                //`<highlightedtile draggable="false" class="piece_moved_${moveType}" style="transform: translate(${(!flipBoard) ? (pieceMoved[0] * boxSize) + 'px, ' + (pieceMoved[1] * boxSize) : ((7 - pieceMoved[0]) * boxSize) + 'px, ' + ((7 - pieceMoved[1]) * boxSize)}px);"></highlightedtile>`
+                    //`<square draggable="false" class="piece_moved_${moveType}" style="transform: translate(${(!flipBoard) ? (pieceMoved[0] * boxSize) + 'px, ' + (pieceMoved[1] * boxSize) : ((7 - pieceMoved[0]) * boxSize) + 'px, ' + ((7 - pieceMoved[1]) * boxSize)}px);"></square>`
             })
         }
     }
@@ -570,10 +574,9 @@ function pieceMove(xVal, yVal, specialCase = false, type = "enpassant") {
         // show promotion selector light
         $("piecePromote").remove()
         let pieceCodes = ['ql', 'rl', 'bl', 'nl']
-        for (let idx = 0; idx < pieceCodes.length; idx++) 
+        for (let idx = 0; idx < pieceCodes.length; idx++)
             piecesLayer.append('<piecePromote onclick="promote(' + xVal + ', ' + yVal + ', \'' + pieceCodes[idx] + '\')" draggable="false" class="' + pieceCodes[idx][0] + ' ' + pieceCodes[idx][1] + `" alt="K-L" style="transform: translate(${(!flipBoard) ? ((idx * 3 / 4) * boxSize) + 'px, ' + (yVal * boxSize) : ((idx * 3 / 4) * boxSize) + 'px, ' + ((7 - yVal) * boxSize)}px);"></piecePromote>`)
-    }
-    else if (yVal === 7 && chessBoard[selectedPiece[1]][selectedPiece[0]].code === 'pd') {
+    } else if (yVal === 7 && chessBoard[selectedPiece[1]][selectedPiece[0]].code === 'pd') {
         // show promotion selector light
         $("piecePromote").remove()
         let pieceCodes = ['qd', 'rd', 'bd', 'nd']
@@ -581,7 +584,10 @@ function pieceMove(xVal, yVal, specialCase = false, type = "enpassant") {
             piecesLayer.append('<piecePromote onclick="promote(' + xVal + ', ' + yVal + ', \'' + pieceCodes[idx] + '\')" draggable="false" class="' + pieceCodes[idx][0] + ' ' + pieceCodes[idx][1] + `" alt="K-L" style="transform: translate(${(!flipBoard) ? ((idx * 3 / 4) * boxSize) + 'px, ' + (yVal * boxSize) : ((idx * 3 / 4) * boxSize) + 'px, ' + ((7 - yVal) * boxSize)}px);"></piecePromote>`)
     } else {
         if (selectedPiece !== null && chessBoard[selectedPiece[1]][selectedPiece[0]] !== 'NA') {
-            sendToWs('move', [['startingPos', selectedPiece], ['endingPos', [xVal, yVal]]])
+            sendToWs('move', [
+                ['startingPos', selectedPiece],
+                ['endingPos', [xVal, yVal]]
+            ])
             valid_positions.empty();
         }
         if (moveNum < 30) {
@@ -597,7 +603,11 @@ function pieceMove(xVal, yVal, specialCase = false, type = "enpassant") {
 }
 
 function promote(xVal, yVal, choice) {
-    sendToWs('move', [['startingPos', selectedPiece], ['endingPos', [xVal, yVal]], ['promote', choice]])
+    sendToWs('move', [
+        ['startingPos', selectedPiece],
+        ['endingPos', [xVal, yVal]],
+        ['promote', choice]
+    ])
     $("piecePromote").remove()
     valid_positions.empty();
 }
@@ -608,7 +618,7 @@ function movesOfPiece(xVal, yVal, clickedPiece) {
         if (yVal - 1 >= 0) {
             if (chessBoard[yVal - 1][xVal] === "NA") {
                 locations.push([xVal, yVal - 1])
-                // First move
+                    // First move
                 if (yVal - 2 > 0 && clickedPiece.moves === 0 && chessBoard[yVal - 2][xVal] === "NA") {
                     locations.push([xVal, yVal - 2])
                 }
@@ -635,7 +645,7 @@ function movesOfPiece(xVal, yVal, clickedPiece) {
         if (yVal + 1 <= 7) {
             if (chessBoard[yVal + 1][xVal] === "NA") {
                 locations.push([xVal, yVal + 1])
-                // First move
+                    // First move
                 if (yVal + 2 < 8 && clickedPiece.moves === 0 && chessBoard[yVal + 2][xVal] === "NA") {
                     locations.push([xVal, yVal + 2])
                 }
@@ -658,23 +668,60 @@ function movesOfPiece(xVal, yVal, clickedPiece) {
         }
     }
     if (clickedPiece.piece === 'n') {
-        let vectors = [[2, 1], [1, 2], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2]]
+        let vectors = [
+            [2, 1],
+            [1, 2],
+            [2, -1],
+            [1, -2],
+            [-1, -2],
+            [-2, -1],
+            [-2, 1],
+            [-1, 2]
+        ]
         locations = getVectorsAbsolute(xVal, yVal, vectors, clickedPiece.team)
     }
     if (clickedPiece.piece === 'b') {
-        let vectors = [[1, 1], [1, -1], [-1, -1], [-1, 1]]
+        let vectors = [
+            [1, 1],
+            [1, -1],
+            [-1, -1],
+            [-1, 1]
+        ]
         locations = rayCastVectors(xVal, yVal, vectors, clickedPiece)
     }
     if (clickedPiece.piece === 'q') {
-        let vectors = [[1, 1], [1, -1], [-1, -1], [-1, 1], [0, 1], [1, 0], [0, -1], [-1, 0]]
+        let vectors = [
+            [1, 1],
+            [1, -1],
+            [-1, -1],
+            [-1, 1],
+            [0, 1],
+            [1, 0],
+            [0, -1],
+            [-1, 0]
+        ]
         locations = rayCastVectors(xVal, yVal, vectors, clickedPiece)
     }
     if (clickedPiece.piece === 'r') {
-        let vectors = [[0, 1], [1, 0], [0, -1], [-1, 0]]
+        let vectors = [
+            [0, 1],
+            [1, 0],
+            [0, -1],
+            [-1, 0]
+        ]
         locations = rayCastVectors(xVal, yVal, vectors, clickedPiece)
     }
     if (clickedPiece.piece === 'k') {
-        let vectors = [[1, 1], [1, -1], [-1, -1], [-1, 1], [0, 1], [1, 0], [0, -1], [-1, 0]]
+        let vectors = [
+            [1, 1],
+            [1, -1],
+            [-1, -1],
+            [-1, 1],
+            [0, 1],
+            [1, 0],
+            [0, -1],
+            [-1, 0]
+        ]
         locations = getVectorsAbsolute(xVal, yVal, vectors, clickedPiece.team)
 
         if (chessMode === 'standard' && clickedPiece.moves === 0 && !inCheck(chessBoard, clickedPiece.team)) {
@@ -722,11 +769,9 @@ function checkIfGameOver() {
     if (inCheckMate(!turn)) {
         appendToMove('#')
         return true;
-    }
-    else if (inStaleMate(!turn)) {
+    } else if (inStaleMate(!turn)) {
         return true;
-    }
-    else return fiftyMoveRuleCountDown === 0;
+    } else return fiftyMoveRuleCountDown === 0;
 }
 
 function writePGN() {
@@ -745,26 +790,60 @@ function inCheck(board, team) {
             if (board[y][x] !== "NA" && board[y][x].piece === 'k' && board[y][x].team === team) {
                 let vectors;
                 //diagonal
-                vectors = [[1, 1], [1, -1], [-1, -1], [-1, 1]]
+                vectors = [
+                    [1, 1],
+                    [1, -1],
+                    [-1, -1],
+                    [-1, 1]
+                ]
                 if (checkRayCastVectorsForPieces(vectors, ['b', 'q'], board, team, [x, y])) {
                     return true;
                 }
                 //straight
-                vectors = [[0, 1], [1, 0], [0, -1], [-1, 0]]
+                vectors = [
+                    [0, 1],
+                    [1, 0],
+                    [0, -1],
+                    [-1, 0]
+                ]
                 if (checkRayCastVectorsForPieces(vectors, ['r', 'q'], board, team, [x, y])) {
                     return true;
                 }
                 //knight
-                vectors = [[2, 1], [1, 2], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2]]
+                vectors = [
+                    [2, 1],
+                    [1, 2],
+                    [2, -1],
+                    [1, -2],
+                    [-1, -2],
+                    [-2, -1],
+                    [-2, 1],
+                    [-1, 2]
+                ]
                 if (checkVectorsForPieces(vectors, ['n'], board, team, [x, y])) {
                     return true;
                 }
                 //king
-                vectors = [[1, 1], [1, -1], [-1, -1], [-1, 1], [0, 1], [1, 0], [0, -1], [-1, 0]]
+                vectors = [
+                    [1, 1],
+                    [1, -1],
+                    [-1, -1],
+                    [-1, 1],
+                    [0, 1],
+                    [1, 0],
+                    [0, -1],
+                    [-1, 0]
+                ]
                 if (checkVectorsForPieces(vectors, ['k'], board, team, [x, y])) {
                     return true
                 }
-                (team) ? vectors = [[1, -1], [-1, -1]] : vectors = [[1, 1], [-1, 1]]
+                (team) ? vectors = [
+                    [1, -1],
+                    [-1, -1]
+                ]: vectors = [
+                    [1, 1],
+                    [-1, 1]
+                ]
                 if (checkVectorsForPieces(vectors, ['p'], board, team, [x, y])) {
                     return true
                 }
@@ -836,7 +915,7 @@ function appendMoveToList(startingPos, newPosition, isEnpassant, timerInfo, prom
             let sameX = false;
             let sameY = false;
             let piecesInDoubt = []
-            // check if any other piece can the move
+                // check if any other piece can the move
             for (let y = 0; y < 8; y++) {
                 for (let x = 0; x < 8; x++) {
                     if (chessBoard[y][x] !== "NA" && chessBoard[y][x].code === movedPiece.code && (x !== startingPos[0] || y !== startingPos[1])) {
@@ -853,11 +932,9 @@ function appendMoveToList(startingPos, newPosition, isEnpassant, timerInfo, prom
                 for (let i = 0; i < piecesInDoubt.length; i++) {
                     if (piecesInDoubt[i][0] === startingPos[0]) {
                         sameX = true
-                    }
-                    else if (piecesInDoubt[i][1] === startingPos[1]) {
+                    } else if (piecesInDoubt[i][1] === startingPos[1]) {
                         sameY = true
-                    }
-                    else {
+                    } else {
                         sameY = true
                     }
                 }
@@ -911,7 +988,7 @@ function goToMove(moveNumber) {
         oldPos = boardSelected.startPos
     else
         oldPos = null
-    
+
     if (boardSelected.hasOwnProperty('endingPos'))
         pieceMoved = boardSelected.endingPos
     else
@@ -930,7 +1007,7 @@ function goToMove(moveNumber) {
     } else {
         drawBoard(boardSelected.board, showingBoard)
     }
-    
+
     $("#resume_game").show()
 }
 
@@ -961,7 +1038,7 @@ function inStaleMate(team) {
     return true;
 }
 
-function checkVectorsForPieces (vectors, pieces, board, team, coords) {
+function checkVectorsForPieces(vectors, pieces, board, team, coords) {
     for (let v = 0; v < vectors.length; v++) {
         // if in bounds
         if (coords[0] + vectors[v][0] >= 0 && coords[0] + vectors[v][0] <= 7 && coords[1] + vectors[v][1] >= 0 && coords[1] + vectors[v][1] <= 7) {
@@ -981,7 +1058,7 @@ function checkVectorsForPieces (vectors, pieces, board, team, coords) {
     return false;
 }
 
-function checkRayCastVectorsForPieces (vectors, pieces, board, team, coords) {
+function checkRayCastVectorsForPieces(vectors, pieces, board, team, coords) {
     for (let v = 0; v < vectors.length; v++) {
         let vectorToCalc = [vectors[v][0], vectors[v][1]]
         let validVector = true;
@@ -1028,11 +1105,12 @@ var oneSecEngineTimeout = null
 
 function drawBoard(board = chessBoard, moveNumber = moveNum, turnToCheck = null) {
     finishAnimations()
+    stopSearching()
     if (animationInterval !== null)
         clearInterval(animationInterval)
     let moveType = "self"
     if ((turnToCheck === null && pieceMoved !== null && board[pieceMoved[1]][pieceMoved[0]].team !== ownTeam) || (turnToCheck !== null && !turnToCheck)) moveType = "other"
-    // resizeCheck()
+        // resizeCheck()
     let extraPieces = []
     let needPieces = []
     for (let y = 0; y < 8; y++)
@@ -1050,7 +1128,7 @@ function drawBoard(board = chessBoard, moveNumber = moveNum, turnToCheck = null)
         }
 
     let piecesToAdd = []
-    let piecesToTranslate = [] 
+    let piecesToTranslate = []
     for (let i = 0; i < needPieces.length; i++) {
         const needPiecePos = needPieces[i]
         const pieceCode = board[needPiecePos[1]][needPiecePos[0]].code
@@ -1072,11 +1150,11 @@ function drawBoard(board = chessBoard, moveNumber = moveNum, turnToCheck = null)
             }
         }
         if (!foundPieceToMove) piecesToAdd.push('<piece class="' +
-            pieceCode[0] + ' ' + pieceCode[1] + '" id="piece' + 
-            needPiecePos[0] + needPiecePos[1] + 
-            '" onclick="pieceClicked(' + needPiecePos[0] + ', ' + needPiecePos[1] + 
+            pieceCode[0] + ' ' + pieceCode[1] + '" id="piece' +
+            needPiecePos[0] + needPiecePos[1] +
+            '" onclick="pieceClicked(' + needPiecePos[0] + ', ' + needPiecePos[1] +
             `)" draggable="false" style="transform: translate(${(!flipBoard) ? (needPiecePos[0] * boxSize) + 'px, ' + (needPiecePos[1] * boxSize) :
-            ((7 - needPiecePos[0]) * boxSize) + 'px, ' + ((7 - needPiecePos[1]) * boxSize)}px);"></piece`)
+                ((7 - needPiecePos[0]) * boxSize) + 'px, ' + ((7 - needPiecePos[1]) * boxSize)}px);"></piece`)
     }
     for (let i = 0; i < extraPieces.length; i++) {
         const pieceToDelete = $("#piece" + extraPieces[i][0] + extraPieces[i][1])
@@ -1093,12 +1171,12 @@ function drawBoard(board = chessBoard, moveNumber = moveNum, turnToCheck = null)
     piecesToAdd.forEach(pieceToAdd => {
         piecesLayer.append(pieceToAdd)
     })
-    $('highlightedtile').remove()
-    // $('piece').removeClass('piece_moved_self piece_moved_other')
+    $('square').remove()
+        // $('piece').removeClass('piece_moved_self piece_moved_other')
     if (pieceMoved !== null) {
         // $("#piece" + pieceMoved[0] + pieceMoved[1]).addClass("piece_moved_" + moveType)
-        piecesLayer.append(`<highlightedtile draggable="false" class="previous_place_${moveType}" style="transform: translate(${(!flipBoard) ? (oldPos[0] * boxSize) + 'px, ' + (oldPos[1] * boxSize) : ((7 - oldPos[0]) * boxSize) + 'px, ' + ((7 - oldPos[1]) * boxSize)}px);"></highlightedtile>`)
-        piecesLayer.append(`<highlightedtile draggable="false" class="piece_moved_${moveType}" style="transform: translate(${(!flipBoard) ? (pieceMoved[0] * boxSize) + 'px, ' + (pieceMoved[1] * boxSize) : ((7 - pieceMoved[0]) * boxSize) + 'px, ' + ((7 - pieceMoved[1]) * boxSize)}px);"></highlightedtile>`)
+        piecesLayer.append(`<square draggable="false" class="previous_place_${moveType}" style="transform: translate(${(!flipBoard) ? (oldPos[0] * boxSize) + 'px, ' + (oldPos[1] * boxSize) : ((7 - oldPos[0]) * boxSize) + 'px, ' + ((7 - oldPos[1]) * boxSize)}px);"></square>`)
+        piecesLayer.append(`<square draggable="false" class="piece_moved_${moveType}" style="transform: translate(${(!flipBoard) ? (pieceMoved[0] * boxSize) + 'px, ' + (pieceMoved[1] * boxSize) : ((7 - pieceMoved[0]) * boxSize) + 'px, ' + ((7 - pieceMoved[1]) * boxSize)}px);"></square>`)
     }
     reDrawBoard = clone(board)
     animationInterval = setInterval(updateAnimations, 10)
@@ -1107,17 +1185,21 @@ function drawBoard(board = chessBoard, moveNumber = moveNum, turnToCheck = null)
     lastMoveNum = moveNumber
     let fen;
     if (pieceMoved !== null) {
-        fen = getFENofBoard(board, board[pieceMoved[1]][pieceMoved[0]].team, moveNumber, 0, chessMode === 'standard') 
+        fen = getFENofBoard(board, board[pieceMoved[1]][pieceMoved[0]].team, moveNumber, 0, chessMode === 'standard')
     } else {
         fen = getFENofBoard(board, false, moveNumber, 0, chessMode === 'standard')
     }
     FENdisplay.text(fen)
+    evaluationTextDisplay.text("Analysing...")
     if (oneSecEngineTimeout !== null) clearTimeout(oneSecEngineTimeout)
+    clearUntilReady = true
+    $('.best_move').remove()
+    console.log("Cleared Best Moves")
     oneSecEngineTimeout = setTimeout(function() {
         evaluationTurn = (fen.split(' ')[1] === 'w')
-        if (importedPGN || (ownUserId !== null && ownUserId === 1)) goToDepth(fen, 30)
+        if (importedPGN || (adminUserIds.includes(ownUserId))) goToDepth(fen, 30)
         oneSecEngineTimeout = null
-    }, 1000)
+    }, 500)
 
 }
 

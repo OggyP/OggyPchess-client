@@ -1,4 +1,4 @@
-function displayError (type, description) {
+function displayError(type, description) {
     if (!errorPageEdited) {
         errorPageEdited = true
         $('div').hide()
@@ -63,18 +63,18 @@ function resizeCheck() {
     valid_positions.height(minSize)
     if (boxSize !== minSize / 8) {
         boxSize = minSize / 8
-        $('piece').each(function() {
+        $('piece').each(function () {
             let currentElement = $(this)
             let piecePos = currentElement.attr('id').replace('piece', '')
             piecePos = [Number(piecePos[0]), Number(piecePos[1])]
             currentElement.css("transform", `translate(${(!flipBoard) ? piecePos[0] * boxSize : (7 - piecePos[0]) * boxSize}px, ${(!flipBoard) ? piecePos[1] * boxSize : (7 - piecePos[1]) * boxSize}px)`)
         })
-        $('highlightedtile').remove()
+        $('square').remove()
         // $('piece').removeClass('piece_moved_self piece_moved_other')
         if (pieceMoved !== null) {
             // $("#piece" + pieceMoved[0] + pieceMoved[1]).addClass("piece_moved_" + moveType)
-            piecesLayer.append(`<highlightedtile draggable="false" class="previous_place_${lastMoveType}" style="transform: translate(${(!flipBoard) ? (oldPos[0] * boxSize) + 'px, ' + (oldPos[1] * boxSize) : ((7 - oldPos[0]) * boxSize) + 'px, ' + ((7 - oldPos[1]) * boxSize)}px);"></highlightedtile>`)
-            piecesLayer.append(`<highlightedtile draggable="false" class="piece_moved_${lastMoveType}" style="transform: translate(${(!flipBoard) ? (pieceMoved[0] * boxSize) + 'px, ' + (pieceMoved[1] * boxSize) : ((7 - pieceMoved[0]) * boxSize) + 'px, ' + ((7 - pieceMoved[1]) * boxSize)}px);"></highlightedtile>`)
+            piecesLayer.append(`<square draggable="false" class="previous_place_${lastMoveType}" style="transform: translate(${(!flipBoard) ? (oldPos[0] * boxSize) + 'px, ' + (oldPos[1] * boxSize) : ((7 - oldPos[0]) * boxSize) + 'px, ' + ((7 - oldPos[1]) * boxSize)}px);"></square>`)
+            piecesLayer.append(`<square draggable="false" class="piece_moved_${lastMoveType}" style="transform: translate(${(!flipBoard) ? (pieceMoved[0] * boxSize) + 'px, ' + (pieceMoved[1] * boxSize) : ((7 - pieceMoved[0]) * boxSize) + 'px, ' + ((7 - pieceMoved[1]) * boxSize)}px);"></square>`)
         }
     }
     boxSize = minSize / 8
@@ -86,8 +86,8 @@ function resizeCheck() {
 
 let queueGameMode = null;
 let modeToName = {
-    "standard" : "Standard Chess",
-    "960"      : "Chess 960"
+    "standard": "Standard Chess",
+    "960": "Chess 960"
 }
 function showTimeSelection(button, gameMode) {
     queueGameMode = gameMode;
@@ -114,12 +114,12 @@ function resetGame() {
     boardAtMove = []
     showingBoard = 0;
     pgnMetaValues = {
-        "Event" : "?",
-        "Site"  : "chess.oggyp.com",
-        "Date"  : new Date().getFullYear() + '.' + new Date().getMonth() + '.' + new Date().getDate(),
-        "Round" : "?",
-        "White" : "?",
-        "Black" : "?",
+        "Event": "?",
+        "Site": "chess.oggyp.com",
+        "Date": new Date().getFullYear() + '.' + new Date().getMonth() + '.' + new Date().getDate(),
+        "Round": "?",
+        "White": "?",
+        "Black": "?",
         "Result": "*"
     }
     pgnMeta = ["Event", "Site", "Date", "Round", "White", "Black", "Result"]
@@ -162,8 +162,8 @@ let timers = null
 function updateTimer() {
     if (timers !== null) {
         let timeRemaining = {
-            "white" : new Date(timers.whiteTimer.time),
-            "black" : new Date(timers.blackTimer.time)
+            "white": new Date(timers.whiteTimer.time),
+            "black": new Date(timers.blackTimer.time)
         }
         if (timers.whiteTimer.isCountingDown) timeRemaining.white = new Date(timers.whiteTimer.time - ((new Date().getTime()) - timers.whiteTimer.timerStartTime))
         if (timers.blackTimer.isCountingDown) timeRemaining.black = new Date(timers.blackTimer.time - ((new Date().getTime()) - timers.blackTimer.timerStartTime))
@@ -298,7 +298,7 @@ const playStopAnimationButton = $("#stop_stop_animation")
 var playMovesInterval = null
 function updatePlayAnimation() {
     if (!drawCurrentBoard) {
-        showingBoard ++
+        showingBoard++
         if (showingBoard >= moveNum) {
             showingBoard = moveNum
             drawCurrentBoard = true;
@@ -446,27 +446,27 @@ async function copyURLToClipboard() {
     try {
         await navigator.clipboard.writeText('https://chess.oggyp.com/?game=' + gameId);
         alert('URL copied to clipboard!');
-    } catch(err) {
+    } catch (err) {
         alert('Error in copying url: ' + err);
     }
 }
 
 function setCookie(cname, cvalue, exdays) {
     const d = new Date();
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    let expires = "expires="+ d.toUTCString();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    let expires = "expires=" + d.toUTCString();
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/;SameSite=None;Secure";
 }
 
 function deleteCookie(name) {
-    document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;SameSite=None;Secure';
+    document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;SameSite=None;Secure';
 }
 
 function getCookie(cname) {
     let name = cname + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
     let ca = decodedCookie.split(';');
-    for(let i = 0; i <ca.length; i++) {
+    for (let i = 0; i < ca.length; i++) {
         let c = ca[i];
         while (c.charAt(0) == ' ') {
             c = c.substring(1);

@@ -16,7 +16,7 @@ if (isset($_GET['game'])) {
     $conn = new mysqli($servername, $username, $password, $dbname);
     // Check connection
     if ($conn->connect_error) {
-        echo("Connection failed: " . $conn->connect_error);
+        echo ("Connection failed: " . $conn->connect_error);
     }
 
     $stmt = $conn->prepare("SELECT * FROM games WHERE id = ?");
@@ -50,10 +50,15 @@ if (isset($_GET['assets'])) {
     }
 }
 ?>
+
 <head>
     <meta charset="UTF-8">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <title><?php if ($isViewingGame) {echo $gameInfo['white'] . " vs " . $gameInfo['black'];} else {echo "OggyP Chess";} ?></title>
+    <title><?php if ($isViewingGame) {
+                echo $gameInfo['white'] . " vs " . $gameInfo['black'];
+            } else {
+                echo "OggyP Chess";
+            } ?></title>
     <meta name="description" content="">
     <!--    META-->
     <meta charset="UTF-8">
@@ -62,8 +67,16 @@ if (isset($_GET['assets'])) {
     <meta name="theme-color" content="#ffffff">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta property="og:title" content="<?php if ($isViewingGame) {echo $gameInfo['white'] . " vs " . $gameInfo['black'];} else {echo "OggyP Chess";} ?>">
-    <meta property="og:description" content="<?php if ($isViewingGame) {echo $gameInfo['score'] . " " . $gameInfo['reason'] . "\n" . $gameInfo['opening'] . "\n" . $pgnVal;} else {echo "Play the highly popular game, chess but with mandatory enpassant! (It is a feature)";} ?>">
+    <meta property="og:title" content="<?php if ($isViewingGame) {
+                                            echo $gameInfo['white'] . " vs " . $gameInfo['black'];
+                                        } else {
+                                            echo "OggyP Chess";
+                                        } ?>">
+    <meta property="og:description" content="<?php if ($isViewingGame) {
+                                                    echo $gameInfo['score'] . " " . $gameInfo['reason'] . "\n" . $gameInfo['opening'] . "\n" . $pgnVal;
+                                                } else {
+                                                    echo "Play the highly popular game, chess but with mandatory enpassant! (It is a feature)";
+                                                } ?>">
     <meta name="description" content="
     <?php if ($isViewingGame) {
         echo $gameInfo['score'] . " " . $gameInfo['reason'] . "\n" . $gameInfo['opening'] . "\n" . $pgnVal;
@@ -102,9 +115,10 @@ if (isset($_GET['assets'])) {
     <link rel="stylesheet" href="/resources/css/normalise.css">
     <link rel="stylesheet" href="/resources/css/mobile.css">
     <?php
-        echo $assetURL;
+    echo $assetURL;
     ?>
 </head>
+
 <body>
     <div id="login-wrapper" class="full-screen-menu">
         <img src="/resources/images/favicon-login-bg.png" alt="" class="bg-img">
@@ -178,9 +192,7 @@ if (isset($_GET['assets'])) {
 
                 <label for="pgn_input">PGN Input</label>
                 <textarea id="pgn_input"></textarea>
-                <button
-                  onclick="$('#game_import_wrapper').hide(); $('#loading-reason').text(' game'); $('#loading').show(); parsePGN($('textarea#pgn_input').val())"
-                >
+                <button onclick="$('#game_import_wrapper').hide(); $('#loading-reason').text(' game'); $('#loading').show(); parsePGN($('textarea#pgn_input').val())">
                     Import
                 </button>
             </div>
@@ -228,16 +240,16 @@ if (isset($_GET['assets'])) {
                 <button onclick="joinQueue()">Queue</button>
             </div>
 
-<!--            <div id="960-menu" class="fill-on-small-screen home_menu">-->
-<!--                <button class="closebtn" onclick="closeHomeMenu('#960-menu')">&times;</button>-->
-<!---->
-<!--                <h3>Chess 960</h3>-->
-<!--                <h4>Time Control</h4>-->
-<!--                <button onclick="sendToWs('queue', [['mode', '960']])">Unlimited</button>-->
-<!--            </div>-->
+            <!--            <div id="960-menu" class="fill-on-small-screen home_menu">-->
+            <!--                <button class="closebtn" onclick="closeHomeMenu('#960-menu')">&times;</button>-->
+            <!---->
+            <!--                <h3>Chess 960</h3>-->
+            <!--                <h4>Time Control</h4>-->
+            <!--                <button onclick="sendToWs('queue', [['mode', '960']])">Unlimited</button>-->
+            <!--            </div>-->
         </div>
 
-<!--        PREVIOUS GAMES-->
+        <!--        PREVIOUS GAMES-->
         <div id="account" class="panel">
             <div id="account-info">
                 <div class="spread-items">
@@ -268,7 +280,7 @@ if (isset($_GET['assets'])) {
     <div id="game_wrapper" class="full-screen-menu panelled">
         <div id="chess_board-wrapper">
             <div id="chess_board">
-                <div id="pieces_layer" ></div>
+                <div id="pieces_layer"></div>
                 <div id="valid_positions"></div>
             </div>
         </div>
@@ -288,9 +300,9 @@ if (isset($_GET['assets'])) {
                 </table>
             </div>
             <div id="options">
-                <h4 id="opening" class="opening">Starting Position</h4>
-                <h5 id="fen_display" class="opening">FEN Value</h5>
-                <h5 id="eveluation" class="opening">Engine Evaluation</h5>
+                <h4 id="opening" class="info-text">Starting Position</h4>
+                <h5 id="fen_display" class="info-text">FEN Value</h5>
+                <h3 id="eveluation" class="info-text">Engine Evaluation</h3>
                 <button onclick="flipBoard = !flipBoard; drawBoard(reDrawBoard, lastMoveNum); valid_positions.empty()">Flip Board</button>
                 <button id="resume_game" onclick="drawCurrentBoard = true; showingBoard = moveNum; drawBoard(); $('#resume_game').hide()" style="display: none;">Resume</button>
                 <button id="stop_stop_animation" onclick="startPlayAnimation()">Play</button>
@@ -316,24 +328,23 @@ if (isset($_GET['assets'])) {
     <script src="resources/javascript/wsHandle.js"></script>
     <script src="resources/stockfish/engine.js"></script>
     <script>
-        (function fix_workers()
-        {
-        var script_tag;
-        /// Does the environment support web workers?  If not, include stockfish.js directly.
-        ///NOTE: Since web workers don't work when a page is loaded from the local system, we have to fake it there too. (Take that security measures!)
-        if (!Worker || (location && location.protocol === "file:")) {
-            var script_tag  = document.createElement("script");
-            script_tag.type ="text/javascript";
-            script_tag.src  = "resources/stockfish/stockfish.js";
-            script_tag.onload = init;
-            document.getElementsByTagName("head")[0].appendChild(script_tag);
-            wait_for_script = true;
-            setTimeout(function ()
-            {
-            console.warn("Loading this example from the file: protocol will load the slower asm.js engine.\nRun server.js and then load http://localhost:8080/ for the WASM engine.");
-            }, 3000);
-        }
+        (function fix_workers() {
+            var script_tag;
+            /// Does the environment support web workers?  If not, include stockfish.js directly.
+            ///NOTE: Since web workers don't work when a page is loaded from the local system, we have to fake it there too. (Take that security measures!)
+            if (!Worker || (location && location.protocol === "file:")) {
+                var script_tag = document.createElement("script");
+                script_tag.type = "text/javascript";
+                script_tag.src = "resources/stockfish/stockfish.js";
+                script_tag.onload = init;
+                document.getElementsByTagName("head")[0].appendChild(script_tag);
+                wait_for_script = true;
+                setTimeout(function() {
+                    console.warn("Loading this example from the file: protocol will load the slower asm.js engine.\nRun server.js and then load http://localhost:8080/ for the WASM engine.");
+                }, 3000);
+            }
         }());
     </script>
 </body>
+
 </html>

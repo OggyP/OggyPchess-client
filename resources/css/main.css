@@ -1,10 +1,10 @@
 /********************
       VARIABLES
 ********************/
+
 :root {
     --primary: #ff1500;
     --secondary: #f88c00;
-
     /* TONES */
     --mignight: #131313;
     --night: #171717;
@@ -12,22 +12,19 @@
     --dark: #2d2d2d;
     --grey: #464646;
     --fog: #bfbfbf;
-
     /* MODE CONTROL */
     --bg-1: var(--evening);
     --bg-2: var(--night);
     --txt: white;
-
     /* FONTS */
     --font-1: 'Noto Sans JP', sans-serif;
 }
 
 
-
-
 /********************
        GENERAL
 ********************/
+
 html {
     background: var(--bg-1);
     font-size: 16px;
@@ -39,7 +36,6 @@ html {
 .full-screen-menu {
     min-width: 100vw;
     min-height: 100vh;
-
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -67,12 +63,10 @@ html {
 
 .panel {
     background: var(--bg-2);
-    
     --bdrs: 15px;
     -webkit-border-radius: var(--bdrs);
     -moz-border-radius: var(--bdrs);
     border-radius: var(--bdrs);
-    
     padding: 25px;
 }
 
@@ -91,22 +85,22 @@ html {
 .disabled:hover {}
 
 
-
-
 /********************
   LOGIN & REGISTER
 ********************/
+
 #login-wrapper label {
     display: none;
 }
 
 
-
-
 /********************
        LOADING
 ********************/
-    /* Thanks to thetallweeks on CodePen for the loading animation */
+
+
+/* Thanks to thetallweeks on CodePen for the loading animation */
+
 .loading {
     margin-top: 0;
     position: relative;
@@ -117,8 +111,8 @@ html {
     position: absolute;
     display: inline-block;
     vertical-align: bottom;
-    -webkit-animation: ellipsis steps(4,end) 1000ms infinite;
-    animation: ellipsis steps(4,end) 1000ms infinite;
+    -webkit-animation: ellipsis steps(4, end) 1000ms infinite;
+    animation: ellipsis steps(4, end) 1000ms infinite;
     content: "...";
     width: 0px;
 }
@@ -130,12 +124,11 @@ html {
 }
 
 
-
-
 /********************
         HOME
 ********************/
-#home > div {
+
+#home>div {
     width: 45%;
 }
 
@@ -149,24 +142,21 @@ h1 img {
 
 
 /* MENUS */
+
 .home_menu {
     background: var(--mignight);
     opacity: 0;
-
     --bdrs: 10px;
     -webkit-border-radius: var(--bdrs);
     -moz-border-radius: var(--bdrs);
     border-radius: var(--bdrs);
-
     padding: 45px 15px;
     width: 500px;
     height: 400px;
-
     display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
     position: fixed;
     left: calc((100vw - 500px) / 2);
     top: calc((100vh - 400px) / 2);
@@ -184,6 +174,7 @@ h1 img {
 
 
 /* GAME IMPORT */
+
 #import-menu {
     padding: 15px;
     width: 30vw;
@@ -211,6 +202,7 @@ h1 img {
 
 
 /* TIME SELECTION */
+
 #time-selection-menu input[type='radio'] {
     display: none;
 }
@@ -226,6 +218,7 @@ h1 img {
 
 
 /* ACCOUNT INFO */
+
 #account-username {
     margin: 0;
     display: flex;
@@ -240,12 +233,13 @@ h1 img {
     color: var(--fog);
 }
 
-#account > h3 {
+#account>h3 {
     margin-top: 1em;
 }
 
 
 /* PREVIOUS GAMES */
+
 #previous_games-wrapper {
     overflow: auto;
     width: 500px;
@@ -290,17 +284,16 @@ h1 img {
 }
 
 
-
-
 /********************
         GAME
 ********************/
+
 #chess_board-wrapper {
     width: min(50vw, 100vh);
     height: min(50vw, 100vh);
 }
 
-#game_wrapper > .panel {
+#game_wrapper>.panel {
     width: 25vw;
 }
 
