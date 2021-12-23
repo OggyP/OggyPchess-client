@@ -63,14 +63,14 @@ function resizeCheck() {
     valid_positions.height(minSize)
     if (boxSize !== minSize / 8) {
         boxSize = minSize / 8
-        $('piece').each(function () {
+        $('piece').each(function() {
             let currentElement = $(this)
             let piecePos = currentElement.attr('id').replace('piece', '')
             piecePos = [Number(piecePos[0]), Number(piecePos[1])]
             currentElement.css("transform", `translate(${(!flipBoard) ? piecePos[0] * boxSize : (7 - piecePos[0]) * boxSize}px, ${(!flipBoard) ? piecePos[1] * boxSize : (7 - piecePos[1]) * boxSize}px)`)
         })
         $('square').remove()
-        // $('piece').removeClass('piece_moved_self piece_moved_other')
+            // $('piece').removeClass('piece_moved_self piece_moved_other')
         if (pieceMoved !== null) {
             // $("#piece" + pieceMoved[0] + pieceMoved[1]).addClass("piece_moved_" + moveType)
             piecesLayer.append(`<square draggable="false" class="previous_place_${lastMoveType}" style="transform: translate(${(!flipBoard) ? (oldPos[0] * boxSize) + 'px, ' + (oldPos[1] * boxSize) : ((7 - oldPos[0]) * boxSize) + 'px, ' + ((7 - oldPos[1]) * boxSize)}px);"></square>`)
@@ -79,9 +79,9 @@ function resizeCheck() {
     }
     boxSize = minSize / 8
     return minSize
-    // let chessPiece = $(".chess_piece")
-    // chessPiece.css("width", boxSize + "px");
-    // chessPiece.css("height", boxSize + "px");
+        // let chessPiece = $(".chess_piece")
+        // chessPiece.css("width", boxSize + "px");
+        // chessPiece.css("height", boxSize + "px");
 }
 
 let queueGameMode = null;
@@ -89,6 +89,7 @@ let modeToName = {
     "standard": "Standard Chess",
     "960": "Chess 960"
 }
+
 function showTimeSelection(button, gameMode) {
     queueGameMode = gameMode;
     $("#time-selection-queue-mode").text(modeToName[gameMode])
@@ -98,12 +99,13 @@ function showTimeSelection(button, gameMode) {
 function joinQueue() {
     let startTimeAmt = document.querySelector('input[name="time_control_start"]:checked').value
     let incrementAmt = document.querySelector('input[name="time_control_inc"]:checked').value
-    sendToWs('queue', [['mode', queueGameMode + ' ' + startTimeAmt + "+" + incrementAmt]])
+    sendToWs('queue', [
+        ['mode', queueGameMode + ' ' + startTimeAmt + "+" + incrementAmt]
+    ])
 }
 
 function resetGame() {
     stopSearching()
-    uciCmd("ucinewgame", evaler)
     importedPGN = false
     selectedPiece = null;
     moveNum = 0
@@ -159,6 +161,7 @@ function resetGame() {
 }
 
 let timers = null
+
 function updateTimer() {
     if (timers !== null) {
         let timeRemaining = {
@@ -239,8 +242,7 @@ function getFENofBoard(chessboard, turn, moveNum, fiftyMoveRuleCountDown, allowC
         castlingToAdd += (chessboard[0][4] !== "NA" && chessboard[0][4].moves === 0 && chessboard[0][4].piece === 'k' && chessboard[0][0] !== "NA" && chessboard[0][0].moves === 0) ? 'q' : '';
         if (castlingToAdd.length === 0) castlingToAdd = '-'
         FEN += castlingToAdd
-    }
-    else {
+    } else {
         FEN += ' -'
     }
     let canEnpassant = false
@@ -296,6 +298,7 @@ function FENtoGame(FEN) {
 
 const playStopAnimationButton = $("#stop_stop_animation")
 var playMovesInterval = null
+
 function updatePlayAnimation() {
     if (!drawCurrentBoard) {
         showingBoard++
@@ -342,12 +345,12 @@ function updateAnimations() {
     for (let i = 0; i < animations.length; i++) {
         let currentAnimation = animations[i]
         currentAnimation.frame++
-        if (currentAnimation.frame <= 20) {
-            let wayThroughAnimation = currentAnimation.frame / 20
-            currentAnimation.elem.css("transform", `translate(${lerp(currentAnimation.startingPos[0], currentAnimation.endingPos[0], wayThroughAnimation)}px, ${lerp(currentAnimation.startingPos[1], currentAnimation.endingPos[1], wayThroughAnimation)}px)`)
-        } else {
-            animations.splice(i, 1)
-        }
+            if (currentAnimation.frame <= 20) {
+                let wayThroughAnimation = currentAnimation.frame / 20
+                currentAnimation.elem.css("transform", `translate(${lerp(currentAnimation.startingPos[0], currentAnimation.endingPos[0], wayThroughAnimation)}px, ${lerp(currentAnimation.startingPos[1], currentAnimation.endingPos[1], wayThroughAnimation)}px)`)
+            } else {
+                animations.splice(i, 1)
+            }
     }
     if (animations.length === 0 && animationInterval !== null) {
         clearInterval(animationInterval)
@@ -363,6 +366,7 @@ function finishAnimations() {
 }
 
 function gameOver(data) {
+    importedPGN = true
     mode = "gameOver"
     $('#reset_game').show()
     gameId = data.gameId
@@ -373,8 +377,7 @@ function gameOver(data) {
     let whiteSymbol;
     if (Math.round(data.ratings[0] - oldRating[0]) === 0) {
         whiteSymbol = "<span class='grey_text'>&plusmn;"
-    }
-    else if (data.ratings[0] > oldRating[0]) {
+    } else if (data.ratings[0] > oldRating[0]) {
         whiteSymbol = "<span class='green_text'>+"
     } else {
         whiteSymbol = "<span class='red_text'>-"
@@ -382,8 +385,7 @@ function gameOver(data) {
     let blackSymbol;
     if (Math.round(data.ratings[1] - oldRating[1]) === 0) {
         blackSymbol = "<span class='grey_text'>&plusmn;"
-    }
-    else if (data.ratings[1] > oldRating[1]) {
+    } else if (data.ratings[1] > oldRating[1]) {
         blackSymbol = "<span class='green_text'>+"
     } else {
         blackSymbol = "<span class='red_text'>-"
@@ -394,7 +396,9 @@ function gameOver(data) {
     let table = $("#previous_games")
     table.prepend(formatOldGame(data.gameListInfo))
     pieceMoved = null
-    stopSearching()
+    if (adminUserIds.includes(ownUserId)) stopSearching()
+    drawBoard()
+    evaluationWrapper.show()
 }
 
 let cachedPGN = {}
@@ -402,7 +406,8 @@ let cachedPGN = {}
 function formatOldGame(oldGame) {
     cachedPGN[oldGame.id] = oldGame.pgn
 
-    let result = "", summarisedResult = "";
+    let result = "",
+        summarisedResult = "";
     if (oldGame.score === "1-0") {
         summarisedResult += (oldGame.white === username) ? "Won" : "Lost";
     } else if (oldGame.score === "0-1") {

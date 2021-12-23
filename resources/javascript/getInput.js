@@ -1,11 +1,10 @@
 // Deal with keyboard input
-window.addEventListener("keydown", function (event) {
+window.addEventListener("keydown", function(event) {
     if (mode === "login") {
         if (event.key === "Enter") {
             login()
         }
-    }
-    else if (mode === "register") {
+    } else if (mode === "register") {
         if (event.key === "Enter") {
             register()
         }
@@ -13,7 +12,7 @@ window.addEventListener("keydown", function (event) {
 }, true);
 
 // keyboard input
-window.addEventListener("keydown", function (event) {
+window.addEventListener("keydown", function(event) {
     if (event.defaultPrevented) {
         return; // Do nothing if the event was already processed
     }
@@ -46,12 +45,23 @@ window.addEventListener("keydown", function (event) {
     if (event.key === "ArrowRight") {
         if (!drawCurrentBoard) {
             showingBoard++
+            if (showingBoard > moveNum) {
+                showingBoard = moveNum
+                return
+            }
             if (showingBoard === moveNum) {
+                showingBoard = moveNum
+                let boardSelected = boardAtMove[moveNum]
+                if (boardSelected.hasOwnProperty('audio')) {
+                    let audioToPlay = audio[boardSelected.audio]
+                    audioToPlay.currentTime = 0
+                    audioToPlay.play()
+                }
                 drawCurrentBoard = true;
-                oldPos = boardAtMove[moveNum].startPos
-                pieceMoved = boardAtMove[moveNum].endingPos
+                oldPos = boardSelected.startPos
+                pieceMoved = boardSelected.endingPos
                 if (ownTeam === null)
-                    drawBoard(chessBoard, showingBoard, boardAtMove[moveNum].board[boardAtMove[moveNum].endingPos[1]][boardAtMove[moveNum].endingPos[0]].team)
+                    drawBoard(chessBoard, showingBoard, boardSelected.board[boardSelected.endingPos[1]][boardSelected.endingPos[0]].team)
                 else
                     drawBoard()
                 $('#resume_game').hide()

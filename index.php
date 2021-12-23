@@ -302,7 +302,9 @@ if (isset($_GET['assets'])) {
             <div id="options">
                 <h4 id="opening" class="info-text">Starting Position</h4>
                 <h5 id="fen_display" class="info-text">FEN Value</h5>
-                <h3 id="eveluation" class="info-text">Engine Evaluation</h3>
+                <div id="evaluation_wrapper">
+                    <h3 id="evaluation" class="info-text">Engine Evaluation</h3>
+                </div>
                 <button onclick="flipBoard = !flipBoard; drawBoard(reDrawBoard, lastMoveNum); valid_positions.empty()">Flip Board</button>
                 <button id="resume_game" onclick="drawCurrentBoard = true; showingBoard = moveNum; drawBoard(); $('#resume_game').hide()" style="display: none;">Resume</button>
                 <button id="stop_stop_animation" onclick="startPlayAnimation()">Play</button>

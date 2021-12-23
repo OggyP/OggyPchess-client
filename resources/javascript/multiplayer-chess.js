@@ -141,7 +141,7 @@ function reveivedMove(event) {
     timers = event.data.timer
     timers.whiteTimer.timerStartTime = new Date().getTime()
     timers.blackTimer.timerStartTime = new Date().getTime()
-    previousMoveTime = new Date().getTime()
+        // previousMoveTime = new Date().getTime()
     if (timers.whiteTimer.isCountingDown && ownTeam) $('#white_timer_text').addClass('green_background');
     else $('#white_timer_text').removeClass('green_background');
     if (timers.blackTimer.isCountingDown && !ownTeam) $('#black_timer_text').addClass('green_background');
@@ -251,6 +251,7 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
     ownTeam = null
     try {
         resetGame()
+        evaluationWrapper.show()
         pgnDownload = pgn
         if (pgnGameId !== 0) {
             gameId = pgnGameId
@@ -964,7 +965,7 @@ function appendMoveToList(startingPos, newPosition, isEnpassant, timerInfo, prom
         moveList.append("<tr>\n" +
             "   <td>" + (moveNum / 2 + 1) + "</td>\n" +
             "   <td onclick='goToMove(" + (moveNum + 1) + ")'><span id='move" + moveNum + "'>" + text + "</span> <span id='timerMove" + moveNum + "' class='time_taken'>" + timeTaken + "</span></td>\n" +
-            "   <td><span id='move" + (moveNum + 1) + "'>" + text + "</span> <span id='timerMove" + (moveNum + 1) + "' class='time_taken'></span></td>\n" +
+            "   <td><span id='move" + (moveNum + 1) + "'>" + "</span> <span id='timerMove" + (moveNum + 1) + "' class='time_taken'></span></td>\n" +
             "</tr>")
     } else {
         //black turn so edit td - id moveNum

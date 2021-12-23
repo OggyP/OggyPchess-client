@@ -97,7 +97,7 @@ piecePromote {
     border: 3px solid black;
 }
 
-#eveluation {
+#evaluation {
     background: purple;
     padding: 10px;
     border-radius: var(--bdrs);

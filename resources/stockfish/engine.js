@@ -6,14 +6,15 @@ var evalerCommandsToSend = []
 function uciCmd(cmd, which) {
     console.log("UCI: " + cmd);
 
-    if (cmd === 'isready') {waitingForReady = true}
-    
+    if (cmd === 'isready') { waitingForReady = true }
+    if (cmd.startsWith('go')) { evalerInfo.isEvaluating = true }
+
     (which || engine).postMessage(cmd);
 }
 
-uciCmd("uci", evaler)
+evalerCommandsToSend.push("uci")
 
-let evalerInfo = {"uciReady": false, 'options': [], "lastEvaluation":"", "isEvaluating": false, "lastBestMove":""}
+let evalerInfo = { "uciReady": false, 'options': [], "lastEvaluation": "", "isEvaluating": false, "lastBestMove": "" }
 
 function goToDepth(fenPosition, depth) {
     if (evalerInfo.isEvaluating) {
@@ -22,11 +23,11 @@ function goToDepth(fenPosition, depth) {
     evalerCommandsToSend.push('isready')
     evalerCommandsToSend.push("position fen " + fenPosition)
     evalerCommandsToSend.push("go depth " + depth)
-    evalerInfo.isEvaluating = true
     uciCmd(evalerCommandsToSend.shift(), evaler)
 }
 
 const infoTypes = ['depth', 'seldepth', 'multipv', 'score', 'nodes', 'nps', 'hashfull', 'tbhits', 'time', 'pv', 'string']
+
 function parseInfoLine(line, turn) {
     let info = {}
     let currentInfoType = ''
@@ -51,12 +52,12 @@ function parseInfoLine(line, turn) {
 }
 
 var evaluationTurn = true
-const evaluationTextDisplay = $("#eveluation")
+const evaluationTextDisplay = $("#evaluation")
 var waitingForReady = false
 var clearUntilReady = false
 evaler.onmessage = function(event) {
     var line;
-    
+
     if (event && typeof event === "object") {
         line = event.data;
     } else {
@@ -84,6 +85,7 @@ evaler.onmessage = function(event) {
     if (line === 'readyok') {
         waitingForReady = false
         clearUntilReady = false
+        evalerInfo.isEvaluating = false
     }
 
     if (waitingForReady) {
@@ -94,6 +96,7 @@ evaler.onmessage = function(event) {
     if (line === 'uciok') {
         evalerInfo.uciReady = true
         uciCmd("setoption name UCI_AnalyseMode value true", evaler)
+        uciCmd("setoption name Use NNUE value true", evaler)
         uciCmd("ucinewgame", evaler)
     }
 
@@ -104,7 +107,7 @@ evaler.onmessage = function(event) {
         if (parsedLineInfo.hasOwnProperty('score')) evaluationTextDisplay.text(`Depth: ${parsedLineInfo.depth} | Score: ${parsedLineInfo.score.replace('upperbound', '').replace('lowerbound', '')}`)
         if (parsedLineInfo.hasOwnProperty('pv')) showBestMove(parsedLineInfo.pv.split(' ')[0])
     }
-    if (line.startsWith('bestmove')) { 
+    if (line.startsWith('bestmove')) {
         evalerInfo.lastBestMove = line.split(' ')[1]
         console.log("Best Move " + line)
         if (importedPGN || (adminUserIds.includes(ownUserId))) showBestMove(evalerInfo.lastBestMove)
@@ -135,15 +138,17 @@ function showBestMove(move) {
 }
 
 function stopSearching() {
-    if (evalerInfo.isEvaluating)  {
-        uciCmd("stop", evaler)
-        evalerInfo.isEvaluating = false
+    if (evalerInfo.isEvaluating) {
+        evalerCommandsToSend.push('stop')
     }
+    evalerCommandsToSend.push('isready')
+    evalerCommandsToSend.push('ucinewgame')
+    uciCmd(evalerCommandsToSend.shift(), evaler)
 }
 
 engine.onmessage = function(event) {
     var line;
-    
+
     if (event && typeof event === "object") {
         line = event.data;
     } else {
