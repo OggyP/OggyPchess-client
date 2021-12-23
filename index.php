@@ -179,7 +179,8 @@ if (isset($_GET['assets'])) {
             <h2>Play</h2>
             <hr>
             <button class="home_item" id="open-standard" onclick="showTimeSelection(this, 'standard')">Standard</button>
-            <button class="home_item" id="open-standard" onclick="showTimeSelection(this, '960')">Chess 960</button>
+            <button class="home_item" id="open-960" onclick="showTimeSelection(this, '960')">Chess 960</button>
+            <button class="home_item" id="open-stockfish" onclick="vsStockfish()">Versus Stockfish</button>
 
             <br><br>
             <button class="home_item" id="open-import" onclick="openHomeMenu(this, '#import-menu')">
@@ -238,6 +239,9 @@ if (isset($_GET['assets'])) {
                     <label for="time_control_inc_20" class="button">20</label>
                 </div>
                 <button onclick="joinQueue()">Queue</button>
+            </div>
+            <div id="stockfish-skill-selector" class="fill-on-small-screen home_menu">
+                <input type="range" min="0" max="20" value="20" id="stockfish-slider">
             </div>
 
             <!--            <div id="960-menu" class="fill-on-small-screen home_menu">-->
@@ -303,7 +307,8 @@ if (isset($_GET['assets'])) {
                 <h4 id="opening" class="info-text">Starting Position</h4>
                 <h5 id="fen_display" class="info-text">FEN Value</h5>
                 <div id="evaluation_wrapper">
-                    <h3 id="evaluation" class="info-text">Engine Evaluation</h3>
+                    <h3 id="evaluation" class="info-text">Analysing...</h3>
+                    <h5 id="evaluation_extra"></h5>
                 </div>
                 <button onclick="flipBoard = !flipBoard; drawBoard(reDrawBoard, lastMoveNum); valid_positions.empty()">Flip Board</button>
                 <button id="resume_game" onclick="drawCurrentBoard = true; showingBoard = moveNum; drawBoard(); $('#resume_game').hide()" style="display: none;">Resume</button>
@@ -313,7 +318,7 @@ if (isset($_GET['assets'])) {
                 <button id="share_game" onclick="copyURLToClipboard()" style="display: none;">Share</button>
                 <button id="in_game_login" onclick="$('#login-wrapper').show(); $('#game_wrapper').hide(); checkForToken()">Login</button>
                 <div id="in_game_options">
-                    <button onclick="sendToWs('game', [['option', 'resign']])">Resign</button>
+                    <button onclick="resign()">Resign</button>
                 </div>
             </div>
         </div>

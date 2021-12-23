@@ -137,15 +137,17 @@ for (let y = 0; y < 8; y++) {
     }
 }
 
-function reveivedMove(event) {
-    timers = event.data.timer
-    timers.whiteTimer.timerStartTime = new Date().getTime()
-    timers.blackTimer.timerStartTime = new Date().getTime()
-        // previousMoveTime = new Date().getTime()
-    if (timers.whiteTimer.isCountingDown && ownTeam) $('#white_timer_text').addClass('green_background');
-    else $('#white_timer_text').removeClass('green_background');
-    if (timers.blackTimer.isCountingDown && !ownTeam) $('#black_timer_text').addClass('green_background');
-    else $('#black_timer_text').removeClass('green_background');
+function receivedMove(event) {
+    if (event.data.hasOwnProperty('timer')) {
+        timers = event.data.timer
+        timers.whiteTimer.timerStartTime = new Date().getTime()
+        timers.blackTimer.timerStartTime = new Date().getTime()
+            // previousMoveTime = new Date().getTime()
+        if (timers.whiteTimer.isCountingDown && ownTeam) $('#white_timer_text').addClass('green_background');
+        else $('#white_timer_text').removeClass('green_background');
+        if (timers.blackTimer.isCountingDown && !ownTeam) $('#black_timer_text').addClass('green_background');
+        else $('#black_timer_text').removeClass('green_background');
+    }
     if (chessBoard[event.data.startingPos[1]][event.data.startingPos[0]] !== 'NA') {
         $("piece").css("opacity", "1")
         pieceMoved = event.data.endingPos
@@ -196,7 +198,8 @@ function reveivedMove(event) {
             }
         }
         valid_positions.empty();
-        drawBoard()
+        showingBoard = moveNum
+        drawBoard(chessBoard, moveNum + 1)
             // if other team in checkmate
         if (!checkIfGameOver() && inCheck(chessBoard, !turn)) {
             appendToMove("+")
@@ -209,6 +212,8 @@ function reveivedMove(event) {
         boardAtMove.push({ 'board': clone(chessBoard), 'startPos': event.data.startingPos, 'endingPos': event.data.endingPos, 'audio': audioToPlay })
         moveNum++;
     }
+    if (selectedPiece !== null && chessBoard[selectedPiece[1]][selectedPiece[0]] !== 'NA')
+        pieceClicked(selectedPiece[0], selectedPiece[1])
     if (moveNum < 30) {
         if (chessMode === 'standard') {
             if (openingList.hasOwnProperty(pgnText.slice(0, -1))) {
@@ -220,6 +225,18 @@ function reveivedMove(event) {
     }
     if (JSON.stringify(chessBoard) === badChessBoard) {
         alert("Ok Gavin")
+    }
+    console.log("Turn " + turn)
+    if (playingAgainstStockfish) {
+        if (turn !== ownTeam) {
+            let fen
+            if (pieceMoved !== null)
+                fen = getFENofBoard(chessBoard, chessBoard[pieceMoved[1]][pieceMoved[0]].team, moveNum, 0, chessMode === 'standard')
+            else
+                fen = getFENofBoard(chessBoard, false, moveNum, 0, chessMode === 'standard')
+            goForTime(fen, 5000)
+        }
+        let hashValResponse = hashFoundThreeTimes(this.previousHashes, hashOfBoard(this.chessBoard))
     }
     if (forcedEnpassant && turn === ownTeam) {
         for (let y = 0; y < 8; y++) {
@@ -249,6 +266,7 @@ function reveivedMove(event) {
 function parsePGN(pgn, pgnGameId = 0, opening = '') {
     chessMode = 'standard'
     ownTeam = null
+    playingAgainstStockfish = false
     try {
         resetGame()
         evaluationWrapper.show()
@@ -536,12 +554,12 @@ function pieceClicked(xVal, yVal) {
                         newBoard[yVal][location[0]] = "NA"
                             // ENPASSANT
                         if (!inCheck(newBoard, clickedPiece.team)) {
-                            onClickText = 'pieceMove(' + location[0] + ', ' + location[1] + ', true)'
+                            onClickText = 'pieceMove(' + location[0] + ', ' + location[1] + ', \'enpassant\')'
                         }
                     } else {
                         // castle
                         if (!inCheck(newBoard, clickedPiece.team)) {
-                            onClickText = 'pieceMove(' + location[0] + ', ' + location[1] + ', true, \'castle\')'
+                            onClickText = 'pieceMove(' + location[0] + ', ' + location[1] + ', \'castle\')'
                         }
                     }
                 } else {
@@ -570,25 +588,36 @@ function alertOfGameOver(score, reason) {
     writePGN()
 }
 
-function pieceMove(xVal, yVal, specialCase = false, type = "enpassant") {
+function pieceMove(xVal, yVal, specialCase = null) {
     if (chessBoard[selectedPiece[1]][selectedPiece[0]].code === 'pl' && yVal === 0) {
         // show promotion selector light
-        $("piecePromote").remove()
+        $("piece_promote").remove()
         let pieceCodes = ['ql', 'rl', 'bl', 'nl']
         for (let idx = 0; idx < pieceCodes.length; idx++)
-            piecesLayer.append('<piecePromote onclick="promote(' + xVal + ', ' + yVal + ', \'' + pieceCodes[idx] + '\')" draggable="false" class="' + pieceCodes[idx][0] + ' ' + pieceCodes[idx][1] + `" alt="K-L" style="transform: translate(${(!flipBoard) ? ((idx * 3 / 4) * boxSize) + 'px, ' + (yVal * boxSize) : ((idx * 3 / 4) * boxSize) + 'px, ' + ((7 - yVal) * boxSize)}px);"></piecePromote>`)
+            piecesLayer.append('<piece_promote onclick="promote(' + xVal + ', ' + yVal + ', \'' + pieceCodes[idx] + '\')" draggable="false" class="' + pieceCodes[idx][0] + ' ' + pieceCodes[idx][1] + `" alt="K-L" style="transform: translate(${(!flipBoard) ? ((idx * 3 / 4) * boxSize) + 'px, ' + (yVal * boxSize) : ((idx * 3 / 4) * boxSize) + 'px, ' + ((7 - yVal) * boxSize)}px);"></piece_promote>`)
     } else if (yVal === 7 && chessBoard[selectedPiece[1]][selectedPiece[0]].code === 'pd') {
         // show promotion selector light
-        $("piecePromote").remove()
+        $("piece_promote").remove()
         let pieceCodes = ['qd', 'rd', 'bd', 'nd']
         for (let idx = 0; idx < pieceCodes.length; idx++)
-            piecesLayer.append('<piecePromote onclick="promote(' + xVal + ', ' + yVal + ', \'' + pieceCodes[idx] + '\')" draggable="false" class="' + pieceCodes[idx][0] + ' ' + pieceCodes[idx][1] + `" alt="K-L" style="transform: translate(${(!flipBoard) ? ((idx * 3 / 4) * boxSize) + 'px, ' + (yVal * boxSize) : ((idx * 3 / 4) * boxSize) + 'px, ' + ((7 - yVal) * boxSize)}px);"></piecePromote>`)
+            piecesLayer.append('<piece_promote onclick="promote(' + xVal + ', ' + yVal + ', \'' + pieceCodes[idx] + '\')" draggable="false" class="' + pieceCodes[idx][0] + ' ' + pieceCodes[idx][1] + `" alt="K-L" style="transform: translate(${(!flipBoard) ? ((idx * 3 / 4) * boxSize) + 'px, ' + (yVal * boxSize) : ((idx * 3 / 4) * boxSize) + 'px, ' + ((7 - yVal) * boxSize)}px);"></piece_promote>`)
     } else {
         if (selectedPiece !== null && chessBoard[selectedPiece[1]][selectedPiece[0]] !== 'NA') {
-            sendToWs('move', [
-                ['startingPos', selectedPiece],
-                ['endingPos', [xVal, yVal]]
-            ])
+            if (playingAgainstStockfish) {
+                let recievedMoveData = {
+                    "startingPos": selectedPiece,
+                    "endingPos": [xVal, yVal]
+                }
+                if (specialCase !== null) recievedMoveData.specialCase = specialCase
+                receivedMove({
+                    "data": recievedMoveData
+                })
+            } else {
+                sendToWs('move', [
+                    ['startingPos', selectedPiece],
+                    ['endingPos', [xVal, yVal]]
+                ])
+            }
             valid_positions.empty();
         }
         if (moveNum < 30) {
@@ -609,7 +638,7 @@ function promote(xVal, yVal, choice) {
         ['endingPos', [xVal, yVal]],
         ['promote', choice]
     ])
-    $("piecePromote").remove()
+    $("piece_promote").remove()
     valid_positions.empty();
 }
 
@@ -769,8 +798,10 @@ function movesOfPiece(xVal, yVal, clickedPiece) {
 function checkIfGameOver() {
     if (inCheckMate(!turn)) {
         appendToMove('#')
+        if (playingAgainstStockfish) gameOverAgainstStockfish((turn) ? "1-0" : "0-1", "By Checkmate")
         return true;
     } else if (inStaleMate(!turn)) {
+        gameOverAgainstStockfish("1/2-1/2", "By Stalemate")
         return true;
     } else return fiftyMoveRuleCountDown === 0;
 }
@@ -1185,17 +1216,15 @@ function drawBoard(board = chessBoard, moveNumber = moveNum, turnToCheck = null)
     lastMoveType = moveType
     lastMoveNum = moveNumber
     let fen;
-    if (pieceMoved !== null) {
+    if (pieceMoved !== null)
         fen = getFENofBoard(board, board[pieceMoved[1]][pieceMoved[0]].team, moveNumber, 0, chessMode === 'standard')
-    } else {
+    else
         fen = getFENofBoard(board, false, moveNumber, 0, chessMode === 'standard')
-    }
     FENdisplay.text(fen)
     evaluationTextDisplay.text("Analysing...")
     if (oneSecEngineTimeout !== null) clearTimeout(oneSecEngineTimeout)
     clearUntilReady = true
     $('.best_move').remove()
-    console.log("Cleared Best Moves")
     oneSecEngineTimeout = setTimeout(function() {
         evaluationTurn = (fen.split(' ')[1] === 'w')
         if (importedPGN || (adminUserIds.includes(ownUserId))) goToDepth(fen, 30)

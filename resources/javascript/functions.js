@@ -104,8 +104,91 @@ function joinQueue() {
     ])
 }
 
+var playingAgainstStockfish = false
+var previousHashes = []
+
+function vsStockfish() {
+    let newBoard = clone(startingPos)
+
+    for (let y = 0; y < 8; y++)
+        for (let x = 0; x < 8; x++)
+            if (newBoard[y][x] !== "NA")
+                newBoard[y][x] = new Piece(newBoard[y][x]);
+
+    previousHashes = [hashOfBoard(newBoard)]
+
+    playingAgainstStockfish = true
+    gameFound({
+        "mode": "standard",
+        "board": [
+            newBoard,
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1"
+        ],
+        "white": [username, ownRating],
+        "black": ["Stockfish 14.1", 3500],
+        "player": true
+    })
+}
+
+function gameFound(data) {
+    console.log(data)
+    if (adminUserIds.includes(ownUserId)) {
+        stopSearching(true)
+        evaluationWrapper.show()
+    } else {
+        evaluationWrapper.hide()
+    }
+    pieceMoved = null
+    timerMoveNum = 0
+    previousMoveTime = new Date().getTime()
+    importedPGN = false;
+    let pgnMetaValues = {
+        "Event": "?",
+        "Site": "chess.oggyp.com",
+        "Date": new Date().getFullYear() + '.' + new Date().getMonth() + '.' + new Date().getDate(),
+        "Round": "?",
+        "White": "?",
+        "Black": "?",
+        "Result": "*",
+        "Mode": "normal",
+        "StartingPos": ""
+    }
+    chessMode = data.mode
+    pgnMetaValues['Mode'] = chessMode
+    chessBoard = data.board[0]
+    pgnMetaValues['StartingPos'] = data.board[1]
+    boardAtMove = [{ "board": clone(chessBoard) }]
+    whitePlayer = data.white
+    blackPlayer = data.black
+    oldRating[0] = whitePlayer[1]
+    oldRating[1] = blackPlayer[1]
+    oldPlayers[0] = whitePlayer[0]
+    oldPlayers[1] = blackPlayer[0]
+    $('#queue_page').hide()
+    $('#home').hide()
+    $("#game_wrapper").show()
+    const whitePlayerName = $("#white_player")
+    const blackPlayerName = $("#black_player")
+    whitePlayerName.text(whitePlayer[0] + " | " + Math.round(whitePlayer[1]))
+    blackPlayerName.text(blackPlayer[0] + " | " + Math.round(blackPlayer[1]))
+    whitePlayerName.css('font-size', 'large')
+    blackPlayerName.css('font-size', 'large')
+    $("#white_timer").show()
+    $("#black_timer").show()
+    ownTeam = data.player
+    pgnMetaValues['White'] = whitePlayer[0]
+    pgnMetaValues['Black'] = blackPlayer[0]
+    flipBoard = !data.player
+    mode = "game"
+    resizeCheck()
+    drawBoard()
+    timerTimeout = setInterval(function() {
+        updateTimer()
+    }, 1000);
+}
+
 function resetGame() {
-    stopSearching()
+    stopSearching(true)
     importedPGN = false
     selectedPiece = null;
     moveNum = 0
@@ -210,8 +293,9 @@ function formatDate(timestamp) {
     return date[2] + " " + day;
 }
 
-function getFENofBoard(chessboard, turn, moveNum, fiftyMoveRuleCountDown, allowCasting) {
+function getFENofBoard(chessboard, turn, moveNumber, fiftyMoveRuleCountDown, allowCasting) {
     let FEN = ""
+    console.log(moveNumber)
     for (let i = 0; i < 8; i++) {
         let emptySpaceCount = 0;
         for (let j = 0; j < 8; j++) {
@@ -248,20 +332,43 @@ function getFENofBoard(chessboard, turn, moveNum, fiftyMoveRuleCountDown, allowC
     let canEnpassant = false
     let yValToCheck = (!turn) ? 3 : 4;
     for (let x = 0; x < 8; x++) {
-        if (chessboard[yValToCheck][x] !== "NA" && chessboard[yValToCheck][x].piece === 'p' && chessboard[yValToCheck][x].moves === 1 && chessboard[yValToCheck][x].lastMoveNum === moveNum - 1) {
-            canEnpassant = true
-            if (!turn)
-                FEN += " " + toChessNotation.x[x] + toChessNotation.y[yValToCheck - 1]
-            else
-                FEN += " " + toChessNotation.x[x] + toChessNotation.y[yValToCheck + 1]
-            break;
+        if (chessboard[yValToCheck][x] !== "NA" && chessboard[yValToCheck][x].piece === 'p' && chessboard[yValToCheck][x].moves === 1) {
+            console.log(chessboard[yValToCheck][x].lastMoveNum + " | " + moveNumber)
+            if (chessboard[yValToCheck][x].lastMoveNum === moveNumber - 1) {
+                canEnpassant = true
+                if (!turn)
+                    FEN += " " + toChessNotation.x[x] + toChessNotation.y[yValToCheck - 1]
+                else
+                    FEN += " " + toChessNotation.x[x] + toChessNotation.y[yValToCheck + 1]
+                break;
+            }
         }
     }
     if (!canEnpassant) FEN += ' -' // enpassant
-    FEN += ` ${fiftyMoveRuleCountDown} ${1 + (Math.floor(moveNum / 2))}` // moves played
+    FEN += ` ${fiftyMoveRuleCountDown} ${1 + (Math.floor(moveNumber / 2))}` // moves played
     return FEN
 }
 
+function resign() {
+    if (!playingAgainstStockfish) {
+        sendToWs('game', [
+            ['option', 'resign']
+        ])
+    } else {
+        gameOverAgainstStockfish("0-1", "Resignation")
+    }
+}
+
+function gameOverAgainstStockfish(type, reason) {
+    stopSearchingEngine()
+    $('#reset_game').show()
+    $("#in_game_options").hide()
+    importedPGN = true
+    mode = "gameOver"
+    alertOfGameOver(type, reason)
+    drawBoard()
+    evaluationWrapper.show()
+}
 
 function FENtoGame(FEN) {
     let startingBoard = []
@@ -392,11 +499,14 @@ function gameOver(data) {
     }
     $("#white_player").html(oldPlayers[0] + " | " + Math.round(data.ratings[0]) + " " + whiteSymbol + Math.abs(Math.round(data.ratings[0] - oldRating[0])) + "</span>")
     $("#black_player").html(oldPlayers[1] + " | " + Math.round(data.ratings[1]) + " " + blackSymbol + Math.abs(Math.round(data.ratings[1] - oldRating[1])) + "</span>")
+    if (ownTeam)
+        ownRating = data.ratings[0]
+    else
+        ownRating = data.ratings[1];
 
     let table = $("#previous_games")
     table.prepend(formatOldGame(data.gameListInfo))
-    pieceMoved = null
-    if (adminUserIds.includes(ownUserId)) stopSearching()
+    if (adminUserIds.includes(ownUserId)) stopSearching(true)
     drawBoard()
     evaluationWrapper.show()
 }
@@ -502,3 +612,47 @@ function closeHomeMenu(menu) {
     });
     $('.home_item').removeClass('disabled');
 }
+
+function hashOfBoard(board) {
+    let boardPieceCode = []
+    for (let y = 0; y < 8; y++) {
+        boardPieceCode.push([])
+        for (let x = 0; x < 8; x++) {
+            if (board[y][x] !== "NA") {
+                boardPieceCode[y].push(board[y][x].code)
+            } else {
+                boardPieceCode[y].push('NA')
+            }
+        }
+    }
+    return JSON.stringify(boardPieceCode).hashCode()
+}
+
+function hashFoundThreeTimes(hashList, hash) {
+    let hashCount = 0
+    for (let i = 0; i < hashList.length; i++) {
+        if (hashList[i] === hash) {
+            hashCount++
+            console.log("Repeat")
+        }
+    }
+    if (hashCount > 1) {
+        // two or more due to a new one being added to make it three
+        return true
+    } else {
+        hashList.push(hash)
+        return hashList
+    }
+}
+
+String.prototype.hashCode = function() {
+    var hash = 0,
+        i, chr;
+    if (this.length === 0) return hash;
+    for (i = 0; i < this.length; i++) {
+        chr = this.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+};

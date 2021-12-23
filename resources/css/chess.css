@@ -60,7 +60,7 @@ th {
 
 piece,
 square,
-piecePromote,
+piece_promote,
 validpos {
     position: absolute;
     top: 0;
@@ -89,7 +89,7 @@ validpos {
     z-index: 4;
 }
 
-piecePromote {
+piece_promote {
     width: 9.375%;
     height: 9.375%;
     z-index: 99 !important;
@@ -97,10 +97,15 @@ piecePromote {
     border: 3px solid black;
 }
 
-#evaluation {
+#evaluation_wrapper {
     background: purple;
     padding: 10px;
     border-radius: var(--bdrs);
+    margin: 10px 0;
+}
+
+#evaluation_wrapper * {
+    margin: 0;
 }
 
 .valid_position {

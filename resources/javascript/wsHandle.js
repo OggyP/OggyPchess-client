@@ -79,59 +79,8 @@ ws.onmessage = function(message) {
             queueMode = data.mode
             mode = "queue"
         } else if (type === 'gameFound') {
-            if (adminUserIds.includes(ownUserId)) {
-                stopSearching()
-                evaluationWrapper.show()
-            } else {
-                evaluationWrapper.hide()
-            }
-            pieceMoved = null
-            timerMoveNum = 0
-            previousMoveTime = new Date().getTime()
-            importedPGN = false;
-            let pgnMetaValues = {
-                "Event": "?",
-                "Site": "chess.oggyp.com",
-                "Date": new Date().getFullYear() + '.' + new Date().getMonth() + '.' + new Date().getDate(),
-                "Round": "?",
-                "White": "?",
-                "Black": "?",
-                "Result": "*",
-                "Mode": "normal",
-                "StartingPos": ""
-            }
-            chessMode = data.mode
-            pgnMetaValues['Mode'] = chessMode
-            chessBoard = data.board[0]
-            pgnMetaValues['StartingPos'] = data.board[1]
-            boardAtMove = [{ "board": clone(chessBoard) }]
-            whitePlayer = data.white
-            blackPlayer = data.black
-            oldRating[0] = whitePlayer[1]
-            oldRating[1] = blackPlayer[1]
-            oldPlayers[0] = whitePlayer[0]
-            oldPlayers[1] = blackPlayer[0]
-            $('#queue_page').hide()
-            $('#home').hide()
-            $("#game_wrapper").show()
-            const whitePlayerName = $("#white_player")
-            const blackPlayerName = $("#black_player")
-            whitePlayerName.text(whitePlayer[0] + " | " + Math.round(whitePlayer[1]))
-            blackPlayerName.text(blackPlayer[0] + " | " + Math.round(blackPlayer[1]))
-            whitePlayerName.css('font-size', 'large')
-            blackPlayerName.css('font-size', 'large')
-            $("#white_timer").show()
-            $("#black_timer").show()
-            ownTeam = data.player
-            pgnMetaValues['White'] = whitePlayer[0]
-            pgnMetaValues['Black'] = blackPlayer[0]
-            flipBoard = !data.player
-            mode = "game"
-            resizeCheck()
-            drawBoard()
-            timerTimeout = setInterval(function() {
-                updateTimer()
-            }, 1000);
+            playingAgainstStockfish = false
+            gameFound(data)
         } else if (type === 'timerUpdate') {
             timers = data
             timers.whiteTimer.timerStartTime = new Date().getTime()
@@ -142,7 +91,7 @@ ws.onmessage = function(message) {
             if (timers.blackTimer.isCountingDown && !ownTeam) $('#black_timer_text').addClass('green_background');
             else $('#black_timer_text').removeClass('green_background');
         } else if (type === 'move') {
-            reveivedMove(event)
+            receivedMove(event)
         } else if (type === 'gameOver') {
             clearInterval(timerTimeout);
             gameOver(data)
