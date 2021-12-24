@@ -58,11 +58,9 @@ let pgnMetaValues = {
     "Round": "?",
     "White": "?",
     "Black": "?",
-    "Result": "*",
-    "Mode": "normal",
-    "FEN": ""
+    "Result": "*"
 }
-let pgnMeta = ["Event", "Site", "Date", "Round", "White", "Black", "Result", "Mode", "FEN"]
+let pgnMeta = ["Event", "Site", "Date", "Round", "White", "Black", "Result"]
 let pgnText = ""
 let pgnDownload = ""
 
@@ -235,8 +233,16 @@ function receivedMove(event) {
             else
                 fen = getFENofBoard(chessBoard, false, moveNum, 0, chessMode === 'standard')
             goForTime(fen, 5000)
+            if (!adminUserIds.includes(ownUserId)) evaluationWrapper.show()
+        } else {
+            if (!adminUserIds.includes(ownUserId)) evaluationWrapper.hide()
         }
-        let hashValResponse = hashFoundThreeTimes(this.previousHashes, hashOfBoard(this.chessBoard))
+        let hashValResponse = hashFoundThreeTimes(previousHashes, hashOfBoard(chessBoard))
+        if (hashValResponse === true) {
+            gameOverAgainstStockfish("1/2-1/2", "Repition")
+        } else {
+            previousHashes = hashValResponse
+        }
     }
     if (forcedEnpassant && turn === ownTeam) {
         for (let y = 0; y < 8; y++) {
@@ -280,8 +286,8 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
         if (opening !== '') {
             openingDisplay.text(opening)
         }
-        let PGNMeta = {}
-        PGNMeta['Mode'] = "standard"
+        pgnMetaValues = {}
+        pgnMeta = []
         let lines = pgn.split('\n')
         let pgnValues = ""
         for (let i = 0; i < lines.length; i++) {
@@ -293,25 +299,33 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
         lines.pop()
         lines.forEach(line => {
             if (line[0] === '[') {
-                PGNMeta[line.split(' ')[0].slice(1)] = line.split('"')[1]
+                pgnMetaValues[line.split(' ')[0].slice(1)] = line.split('"')[1]
+                pgnMeta.push(line.split(' ')[0].slice(1))
             }
         })
 
         pgnValues = pgnValues.split(" ")
-        if (PGNMeta.hasOwnProperty('FEN')) {
-            // Custom starting positions
-            chessBoard = FENtoGame(PGNMeta["FEN"])
+
+        // Custom starting positions
+        if (pgnMetaValues.hasOwnProperty('FEN')) {
+            chessBoard = FENtoGame(pgnMetaValues["FEN"])
+        } else if (pgnMetaValues.hasOwnProperty('StartingPos')) {
+            chessBoard = FENtoGame(pgnMetaValues["StartingPos"])
         }
-        if (PGNMeta.hasOwnProperty('Mode')) {
-            chessMode = PGNMeta["Mode"]
+
+        // Other Variants
+        if (pgnMetaValues.hasOwnProperty('Mode')) {
+            chessMode = pgnMetaValues["Mode"]
+        } else if (pgnMetaValues.hasOwnProperty('Variant')) {
+            chessMode = pgnMetaValues["Variant"]
         }
 
         $('#loading').hide()
         $('#queue_page').hide()
         $('#home').hide()
         $("#game_wrapper").show()
-        if (PGNMeta.hasOwnProperty('White')) $("#white_player").text((PGNMeta['White'].length > 18) ? PGNMeta['White'].slice(0, 15) + "..." : PGNMeta['White'])
-        if (PGNMeta.hasOwnProperty('Black')) $("#black_player").text((PGNMeta['Black'].length > 18) ? PGNMeta['Black'].slice(0, 15) + "..." : PGNMeta['Black'])
+        if (pgnMetaValues.hasOwnProperty('White')) $("#white_player").text((pgnMetaValues['White'].length > 14) ? pgnMetaValues['White'].slice(0, 10) + "..." : pgnMetaValues['White'])
+        if (pgnMetaValues.hasOwnProperty('Black')) $("#black_player").text((pgnMetaValues['Black'].length > 14) ? pgnMetaValues['Black'].slice(0, 10) + "..." : pgnMetaValues['Black'])
         $('#in_game_options').hide()
         boardAtMove.push({ 'board': clone(chessBoard) })
         drawCurrentBoard = false
@@ -1263,10 +1277,6 @@ function rayCastVectors(xVal, yVal, vectors, clickedPiece) {
         }
     }
     return locations;
-}
-
-function clone(obj) {
-    return JSON.parse(JSON.stringify(obj))
 }
 
 // Download function found on https://stackoverflow.com/questions/3665115/how-to-create-a-file-in-memory-for-user-to-download-but-not-through-server

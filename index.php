@@ -296,7 +296,7 @@ if (isset($_GET['assets'])) {
                         <th id="white_player">White's Move</th>
                         <th id="black_player">Black's Move</th>
                     </tr>
-                    <tr>
+                    <tr id='timer-row'>
                         <th></th>
                         <th id="white_timer"><span id='white_timer_text' class='timer_text'></span></th>
                         <th id="black_timer"><span id='black_timer_text' class='timer_text'></span></th>

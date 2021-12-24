@@ -90,6 +90,10 @@ let modeToName = {
     "960": "Chess 960"
 }
 
+let variantNames = {
+    "960": "Chess960"
+}
+
 function showTimeSelection(button, gameMode) {
     queueGameMode = gameMode;
     $("#time-selection-queue-mode").text(modeToName[gameMode])
@@ -128,6 +132,10 @@ function vsStockfish() {
         "black": ["Stockfish 14.1", 3500],
         "player": true
     })
+
+    $("#timer-row").hide()
+
+    if (!adminUserIds.includes(ownUserId)) evaluationTextExtraDisplay.hide()
 }
 
 function gameFound(data) {
@@ -142,21 +150,25 @@ function gameFound(data) {
     timerMoveNum = 0
     previousMoveTime = new Date().getTime()
     importedPGN = false;
-    let pgnMetaValues = {
+    pgnMeta = ["Event", "Site", "Date", "Round", "White", "Black", "Result"]
+    pgnMetaValues = {
         "Event": "?",
         "Site": "chess.oggyp.com",
         "Date": new Date().getFullYear() + '.' + new Date().getMonth() + '.' + new Date().getDate(),
         "Round": "?",
         "White": "?",
         "Black": "?",
-        "Result": "*",
-        "Mode": "normal",
-        "StartingPos": ""
+        "Result": "*"
     }
     chessMode = data.mode
-    pgnMetaValues['Mode'] = chessMode
+
     chessBoard = data.board[0]
-    pgnMetaValues['StartingPos'] = data.board[1]
+    if (chessMode !== 'standard') {
+        pgnMetaValues['StartingPos'] = data.board[1]
+        pgnMeta.push('StartingPos')
+        pgnMetaValues['Variant'] = variantNames[chessMode]
+        pgnMeta.push('Variant')
+    }
     boardAtMove = [{ "board": clone(chessBoard) }]
     whitePlayer = data.white
     blackPlayer = data.black
@@ -169,8 +181,8 @@ function gameFound(data) {
     $("#game_wrapper").show()
     const whitePlayerName = $("#white_player")
     const blackPlayerName = $("#black_player")
-    whitePlayerName.text(whitePlayer[0] + " | " + Math.round(whitePlayer[1]))
-    blackPlayerName.text(blackPlayer[0] + " | " + Math.round(blackPlayer[1]))
+    whitePlayerName.html(whitePlayer[0] + " <span class='in-game-rating'>" + Math.round(whitePlayer[1]) + "</span>")
+    blackPlayerName.html(blackPlayer[0] + " <span class='in-game-rating'>" + Math.round(blackPlayer[1]) + "</span>")
     whitePlayerName.css('font-size', 'large')
     blackPlayerName.css('font-size', 'large')
     $("#white_timer").show()
@@ -225,10 +237,10 @@ function resetGame() {
     moveList.empty()
     moveList.append('<tr>\n' +
         '                    <th class="move-num"></th>\n' +
-        '                    <th id="white_player">White\'s Move</th>\n' +
-        '                    <th id="black_player">Black\'s Move</th>\n' +
+        '                    <th id="white_player">White\'s Username</th>\n' +
+        '                    <th id="black_player">Black\'s Username</th>\n' +
         '                </tr>')
-    moveList.append('<tr>\n' +
+    moveList.append('<tr id="timer-row">\n' +
         '                    <th class="move-num"></th>\n' +
         '                    <th id="white_timer"><span id="white_timer_text" class="timer_text"></span></th>\n' +
         '                    <th id="black_timer"><span id="black_timer_text" class="timer_text"></span></th>\n' +
@@ -360,6 +372,7 @@ function resign() {
 }
 
 function gameOverAgainstStockfish(type, reason) {
+    playingAgainstStockfish = false
     stopSearchingEngine()
     $('#reset_game').show()
     $("#in_game_options").hide()
@@ -497,8 +510,8 @@ function gameOver(data) {
     } else {
         blackSymbol = "<span class='red_text'>-"
     }
-    $("#white_player").html(oldPlayers[0] + " | " + Math.round(data.ratings[0]) + " " + whiteSymbol + Math.abs(Math.round(data.ratings[0] - oldRating[0])) + "</span>")
-    $("#black_player").html(oldPlayers[1] + " | " + Math.round(data.ratings[1]) + " " + blackSymbol + Math.abs(Math.round(data.ratings[1] - oldRating[1])) + "</span>")
+    $("#white_player").html(oldPlayers[0] + " <span class='in-game-rating'>" + Math.round(data.ratings[0]) + "</span> " + whiteSymbol + Math.abs(Math.round(data.ratings[0] - oldRating[0])) + "</span>")
+    $("#black_player").html(oldPlayers[1] + " <span class='in-game-rating'>" + Math.round(data.ratings[1]) + "</span> " + blackSymbol + Math.abs(Math.round(data.ratings[1] - oldRating[1])) + "</span>")
     if (ownTeam)
         ownRating = data.ratings[0]
     else
@@ -656,3 +669,7 @@ String.prototype.hashCode = function() {
     }
     return hash;
 };
+
+function clone(obj) {
+    return JSON.parse(JSON.stringify(obj))
+}

@@ -213,6 +213,20 @@ engine.onmessage = function(event) {
         uciCmd("ucinewgame", engine)
     }
 
+    if (line.startsWith('info') && line.split(' ')[3] !== 'currmove') {
+        evalerInfo.lastEvaluation = line
+        let parsedLineInfo = parseInfoLine(line, evaluationTurn)
+            // console.log(parsedLineInfo)
+        if (parsedLineInfo.hasOwnProperty('depth')) {
+            if (Number(parsedLineInfo.depth) >= 30) uciCmd("stop", engine)
+        }
+        if (!adminUserIds.includes(ownUserId)) {
+            // Show what it is thinking
+            if (parsedLineInfo.hasOwnProperty('pv')) showBestMove(parsedLineInfo.pv.split(' ')[0])
+            evaluationTextDisplay.text(`Depth: ${parsedLineInfo.depth} | Nodes: ${parsedLineInfo.nodes}`)
+        }
+    }
+
     if (line.startsWith('bestmove')) {
         console.log(waitingForReadyEngine)
         engineInfo.isEvaluating = false

@@ -115,6 +115,10 @@ piece_promote {
     /*height: 100px;*/
 }
 
+.in-game-rating {
+    color: grey
+}
+
 .info-text {
     font-family: 'Roboto', sans-serif;
 }
