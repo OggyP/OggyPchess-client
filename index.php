@@ -205,6 +205,8 @@ if (isset($_GET['assets'])) {
                 <h4>Time Controls</h4>
                 <h3>Starting Time (Mins)</h3>
                 <div id="time_control_start">
+                    <input type="radio" id="time_control_start_0.5" name="time_control_start" value="0.5">
+                    <label for="time_control_start_0.5" class="button">0.5</label>
                     <input type="radio" id="time_control_start_1" name="time_control_start" value="1">
                     <label for="time_control_start_1" class="button">1</label>
                     <input type="radio" id="time_control_start_2" name="time_control_start" value="2">

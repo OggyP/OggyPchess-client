@@ -1199,9 +1199,11 @@ function drawBoard(board = chessBoard, moveNumber = moveNum, turnToCheck = null)
         for (let j = 0; j < extraPieces.length; j++) {
             const extraPieceCode = reDrawBoard[extraPieces[j][1]][extraPieces[j][0]].code
             if (extraPieceCode === pieceCode) {
+                let pieceOnBoard = $("#piece" + extraPieces[j][0] + extraPieces[j][1])
+                console.log(pieceOnBoard.css('transform'))
                 piecesToTranslate.push({
-                    "elem": $("#piece" + extraPieces[j][0] + extraPieces[j][1]),
-                    "startingPos": ((previousBoardOrientation !== flipBoard && flipBoard) || (previousBoardOrientation === flipBoard && !flipBoard)) ? [(extraPieces[j][0] * boxSize), (extraPieces[j][1] * boxSize)] : [((7 - extraPieces[j][0]) * boxSize), ((7 - extraPieces[j][1]) * boxSize)],
+                    "elem": pieceOnBoard,
+                    "startingPos": [pieceOnBoard.css('transform').split(', ')[4], pieceOnBoard.css('transform').split(', ')[5].replace(')', '')],
                     "endingPos": (!flipBoard) ? [(needPiecePos[0] * boxSize), (needPiecePos[1] * boxSize)] : [((7 - needPiecePos[0]) * boxSize), ((7 - needPiecePos[1]) * boxSize)],
                     "newId": 'piece' + needPiecePos[0] + needPiecePos[1],
                     "onClickPos": needPiecePos[0] + ', ' + needPiecePos[1],

@@ -505,6 +505,7 @@ function finishAnimations() {
 }
 
 function gameOver(data) {
+    mouseUp()
     importedPGN = true
     mode = "gameOver"
     $('#reset_game').show()
@@ -529,6 +530,10 @@ function gameOver(data) {
     } else {
         blackSymbol = "<span class='red_text'>-"
     }
+    if (ownTeam)
+        $('#account-username').html(username + "<span id=\"account-rating\">" + Math.round(data.ratings[0]) + "</span>")
+    else
+        $('#account-username').html(username + "<span id=\"account-rating\">" + Math.round(data.ratings[1]) + "</span>")
     $("#white_player").html(oldPlayers[0] + " <span class='in-game-rating'>" + Math.round(data.ratings[0]) + "</span> " + whiteSymbol + Math.abs(Math.round(data.ratings[0] - oldRating[0])) + "</span>")
     $("#black_player").html(oldPlayers[1] + " <span class='in-game-rating'>" + Math.round(data.ratings[1]) + "</span> " + blackSymbol + Math.abs(Math.round(data.ratings[1] - oldRating[1])) + "</span>")
     if (ownTeam)
