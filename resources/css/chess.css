@@ -81,6 +81,7 @@ square {
 }
 
 piece {
+    cursor: pointer;
     z-index: 3;
 }
 
@@ -95,6 +96,10 @@ piece_promote {
     z-index: 99 !important;
     background-color: whitesmoke;
     border: 3px solid black;
+}
+
+piece.dragged {
+    z-index: 98 !important;
 }
 
 #evaluation_wrapper {

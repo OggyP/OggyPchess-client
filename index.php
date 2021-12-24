@@ -180,7 +180,7 @@ if (isset($_GET['assets'])) {
             <hr>
             <button class="home_item" id="open-standard" onclick="showTimeSelection(this, 'standard')">Standard</button>
             <button class="home_item" id="open-960" onclick="showTimeSelection(this, '960')">Chess 960</button>
-            <button class="home_item" id="open-stockfish" onclick="vsStockfish()">Versus Stockfish</button>
+            <button class="home_item" id="open-stockfish" onclick="openHomeMenu(this, '#stockfish-skill-selector')">Versus Stockfish</button>
 
             <br><br>
             <button class="home_item" id="open-import" onclick="openHomeMenu(this, '#import-menu')">
@@ -241,16 +241,11 @@ if (isset($_GET['assets'])) {
                 <button onclick="joinQueue()">Queue</button>
             </div>
             <div id="stockfish-skill-selector" class="fill-on-small-screen home_menu">
+                <h3>Stockfish Difficulty: <span id="stockfish-difficulty">20</span></h3>
+                <button class="closebtn" onclick="closeHomeMenu('#stockfish-skill-selector')">&times;</button>
                 <input type="range" min="0" max="20" value="20" id="stockfish-slider">
+                <button onclick="vsStockfish()">Play</button>
             </div>
-
-            <!--            <div id="960-menu" class="fill-on-small-screen home_menu">-->
-            <!--                <button class="closebtn" onclick="closeHomeMenu('#960-menu')">&times;</button>-->
-            <!---->
-            <!--                <h3>Chess 960</h3>-->
-            <!--                <h4>Time Control</h4>-->
-            <!--                <button onclick="sendToWs('queue', [['mode', '960']])">Unlimited</button>-->
-            <!--            </div>-->
         </div>
 
         <!--        PREVIOUS GAMES-->

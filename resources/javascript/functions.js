@@ -47,6 +47,7 @@ function showGame() {
 }
 
 let boxSize = 100;
+var minSize = 100;
 
 // Handle resize
 function resizeCheck() {
@@ -54,7 +55,7 @@ function resizeCheck() {
     const piecesDiv = $('#pieces_layer')
     wrapperWidth = $('#chess_board-wrapper').width();
     wrapperHeight = $('#chess_board-wrapper').height();
-    let minSize = Math.min(wrapperWidth, wrapperHeight);
+    minSize = Math.min(wrapperWidth, wrapperHeight);
     chessBoardDiv.width(minSize)
     chessBoardDiv.height(minSize)
     piecesDiv.width(minSize)
@@ -100,6 +101,10 @@ function showTimeSelection(button, gameMode) {
     openHomeMenu(button, '#time-selection-menu')
 }
 
+function showDifficultySelection(button) {
+    openHomeMenu(button, '#time-selection-menu')
+}
+
 function joinQueue() {
     let startTimeAmt = document.querySelector('input[name="time_control_start"]:checked').value
     let incrementAmt = document.querySelector('input[name="time_control_inc"]:checked').value
@@ -111,13 +116,26 @@ function joinQueue() {
 var playingAgainstStockfish = false
 var previousHashes = []
 
+var stockfishLevel = 20
+
+var slider = document.getElementById("stockfish-slider");
+let stockfishLevelText = $("#stockfish-difficulty")
+slider.oninput = function() {
+    stockfishLevel = this.value
+    console.log(stockfishLevel)
+    stockfishLevelText.text(stockfishLevel)
+}
+
 function vsStockfish() {
+    valid_positions.empty()
     let newBoard = clone(startingPos)
 
     for (let y = 0; y < 8; y++)
         for (let x = 0; x < 8; x++)
             if (newBoard[y][x] !== "NA")
                 newBoard[y][x] = new Piece(newBoard[y][x]);
+
+    uciCmd(`setoption name Skill Level value ${stockfishLevel}`, engine)
 
     previousHashes = [hashOfBoard(newBoard)]
 
@@ -146,6 +164,7 @@ function gameFound(data) {
     } else {
         evaluationWrapper.hide()
     }
+    valid_positions.empty()
     pieceMoved = null
     timerMoveNum = 0
     previousMoveTime = new Date().getTime()

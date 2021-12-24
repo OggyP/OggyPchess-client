@@ -7,7 +7,7 @@ var engineCommandsToSend = []
 var waitingForReadyEngine = false
 
 function uciCmd(cmd, which) {
-    console.log("UCI: " + cmd);
+    // console.log("UCI: " + cmd);
 
     if (cmd === 'isready') {
         if (which === evaler)
@@ -21,6 +21,8 @@ function uciCmd(cmd, which) {
         else
             engineInfo.isEvaluating = true
     }
+
+    if (cmd.startsWith('set')) { console.log(cmd) }
 
     (which || engine).postMessage(cmd);
 }
@@ -118,7 +120,7 @@ evaler.onmessage = function(event) {
                 if (Number(parsedLineInfo.score.split(' ')[1]) === 0) {
                     evalText = "Checkmate"
                 } else {
-                    console.log(parsedLineInfo.score)
+                    // console.log(parsedLineInfo.score)
                     evalText = `${(parsedLineInfo.score.split(' ')[1][0] == '-') ? '-' : '+'}M ${Math.abs(Number(parsedLineInfo.score.split(' ')[1]))}`
                 }
             } else {
@@ -138,7 +140,7 @@ evaler.onmessage = function(event) {
     }
     if (line.startsWith('bestmove')) {
         evalerInfo.lastBestMove = line.split(' ')[1]
-        console.log("Best Move " + line)
+            // console.log("Best Move " + line)
         if (importedPGN || (adminUserIds.includes(ownUserId))) showBestMove(evalerInfo.lastBestMove)
         evalerInfo.isEvaluating = false
     }
@@ -160,8 +162,8 @@ function showBestMove(move) {
             // console.log("Draw Best Move Square")
             let startingPos = [fromChessNotation.x[move[0]], fromChessNotation.y[move[1]]]
             let endingPos = [fromChessNotation.x[move[2]], fromChessNotation.y[move[3]]]
-            piecesLayer.append(`<square draggable="false" class="best_move best_move_start" style="transform: translate(${(!flipBoard) ? (startingPos[0] * boxSize) + 'px, ' + (startingPos[1] * boxSize) : ((7 - startingPos[0]) * boxSize) + 'px, ' + ((7 - startingPos[1]) * boxSize)}px);"></square>`)
-            piecesLayer.append(`<square draggable="false" class="best_move best_move_end" style="transform: translate(${(!flipBoard) ? (endingPos[0] * boxSize) + 'px, ' + (endingPos[1] * boxSize) : ((7 - endingPos[0]) * boxSize) + 'px, ' + ((7 - endingPos[1]) * boxSize)}px);"></square>`)
+            piecesLayer.append(`<square class="best_move best_move_start" style="transform: translate(${(!flipBoard) ? (startingPos[0] * boxSize) + 'px, ' + (startingPos[1] * boxSize) : ((7 - startingPos[0]) * boxSize) + 'px, ' + ((7 - startingPos[1]) * boxSize)}px);"></square>`)
+            piecesLayer.append(`<square class="best_move best_move_end" style="transform: translate(${(!flipBoard) ? (endingPos[0] * boxSize) + 'px, ' + (endingPos[1] * boxSize) : ((7 - endingPos[0]) * boxSize) + 'px, ' + ((7 - endingPos[1]) * boxSize)}px);"></square>`)
         }
     }
 }
@@ -202,7 +204,7 @@ engine.onmessage = function(event) {
     }
 
     if (waitingForReadyEngine) {
-        console.log("returned engine")
+        // console.log("returned engine")
         return
     }
 
@@ -222,13 +224,13 @@ engine.onmessage = function(event) {
         }
         if (!adminUserIds.includes(ownUserId)) {
             // Show what it is thinking
-            if (parsedLineInfo.hasOwnProperty('pv')) showBestMove(parsedLineInfo.pv.split(' ')[0])
+            if (parsedLineInfo.hasOwnProperty('pv') && stockfishLevel === 20) showBestMove(parsedLineInfo.pv.split(' ')[0])
             evaluationTextDisplay.text(`Depth: ${parsedLineInfo.depth} | Nodes: ${parsedLineInfo.nodes}`)
         }
     }
 
     if (line.startsWith('bestmove')) {
-        console.log(waitingForReadyEngine)
+        // console.log(waitingForReadyEngine)
         engineInfo.isEvaluating = false
         let move = line.split(' ')[1]
         let startingPos = [fromChessNotation.x[move[0]], fromChessNotation.y[move[1]]]
@@ -243,7 +245,7 @@ engine.onmessage = function(event) {
             // promote
             recievedMoveData.promote = move[4] + "d"
         }
-        console.log(recievedMoveData)
+        // console.log(recievedMoveData)
         receivedMove({
             "data": recievedMoveData
         })

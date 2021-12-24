@@ -546,7 +546,10 @@ function legalMovesOfPiece(startingPos, endingPos) {
     return [false];
 }
 
+var validMoves = []
+
 function pieceClicked(xVal, yVal) {
+    validMoves = []
     if (drawCurrentBoard && !importedPGN) {
         $("piece").css("opacity", "1")
         $("#piece" + xVal + yVal).css("opacity", "0.6")
@@ -569,21 +572,35 @@ function pieceClicked(xVal, yVal) {
                             // ENPASSANT
                         if (!inCheck(newBoard, clickedPiece.team)) {
                             onClickText = 'pieceMove(' + location[0] + ', ' + location[1] + ', \'enpassant\')'
+                            validMoves.push({
+                                "x": location[0],
+                                "y": location[1],
+                                "specialCase": "enpassant"
+                            })
                         }
                     } else {
                         // castle
                         if (!inCheck(newBoard, clickedPiece.team)) {
                             onClickText = 'pieceMove(' + location[0] + ', ' + location[1] + ', \'castle\')'
+                            validMoves.push({
+                                "x": location[0],
+                                "y": location[1],
+                                "specialCase": "castle"
+                            })
                         }
                     }
                 } else {
                     //check if the king is in check
                     if (!inCheck(newBoard, clickedPiece.team)) {
                         onClickText = 'pieceMove(' + location[0] + ', ' + location[1] + ')'
+                        validMoves.push({
+                            "x": location[0],
+                            "y": location[1],
+                        })
                     }
                 }
                 if (onClickText !== null)
-                    valid_positions.append(`<validpos onclick="${onClickText}" draggable="false" style="transform: translate(${drawX * boxSize}px, ${drawY * boxSize}px);"></validpos>`)
+                    valid_positions.append(`<validpos onclick="${onClickText}" style="transform: translate(${drawX * boxSize}px, ${drawY * boxSize}px);"></validpos>`)
                     //`<square draggable="false" class="piece_moved_${moveType}" style="transform: translate(${(!flipBoard) ? (pieceMoved[0] * boxSize) + 'px, ' + (pieceMoved[1] * boxSize) : ((7 - pieceMoved[0]) * boxSize) + 'px, ' + ((7 - pieceMoved[1]) * boxSize)}px);"></square>`
             })
         }
@@ -608,13 +625,13 @@ function pieceMove(xVal, yVal, specialCase = null) {
         $("piece_promote").remove()
         let pieceCodes = ['ql', 'rl', 'bl', 'nl']
         for (let idx = 0; idx < pieceCodes.length; idx++)
-            piecesLayer.append('<piece_promote onclick="promote(' + xVal + ', ' + yVal + ', \'' + pieceCodes[idx] + '\')" draggable="false" class="' + pieceCodes[idx][0] + ' ' + pieceCodes[idx][1] + `" alt="K-L" style="transform: translate(${(!flipBoard) ? ((idx * 3 / 4) * boxSize) + 'px, ' + (yVal * boxSize) : ((idx * 3 / 4) * boxSize) + 'px, ' + ((7 - yVal) * boxSize)}px);"></piece_promote>`)
+            piecesLayer.append('<piece_promote onclick="promote(' + xVal + ', ' + yVal + ', \'' + pieceCodes[idx] + '\')" class="' + pieceCodes[idx][0] + ' ' + pieceCodes[idx][1] + `" alt="K-L" style="transform: translate(${(!flipBoard) ? ((idx * 3 / 4) * boxSize) + 'px, ' + (yVal * boxSize) : ((idx * 3 / 4) * boxSize) + 'px, ' + ((7 - yVal) * boxSize)}px);"></piece_promote>`)
     } else if (yVal === 7 && chessBoard[selectedPiece[1]][selectedPiece[0]].code === 'pd') {
         // show promotion selector light
         $("piece_promote").remove()
         let pieceCodes = ['qd', 'rd', 'bd', 'nd']
         for (let idx = 0; idx < pieceCodes.length; idx++)
-            piecesLayer.append('<piece_promote onclick="promote(' + xVal + ', ' + yVal + ', \'' + pieceCodes[idx] + '\')" draggable="false" class="' + pieceCodes[idx][0] + ' ' + pieceCodes[idx][1] + `" alt="K-L" style="transform: translate(${(!flipBoard) ? ((idx * 3 / 4) * boxSize) + 'px, ' + (yVal * boxSize) : ((idx * 3 / 4) * boxSize) + 'px, ' + ((7 - yVal) * boxSize)}px);"></piece_promote>`)
+            piecesLayer.append('<piece_promote onclick="promote(' + xVal + ', ' + yVal + ', \'' + pieceCodes[idx] + '\')" class="' + pieceCodes[idx][0] + ' ' + pieceCodes[idx][1] + `" alt="K-L" style="transform: translate(${(!flipBoard) ? ((idx * 3 / 4) * boxSize) + 'px, ' + (yVal * boxSize) : ((idx * 3 / 4) * boxSize) + 'px, ' + ((7 - yVal) * boxSize)}px);"></piece_promote>`)
     } else {
         if (selectedPiece !== null && chessBoard[selectedPiece[1]][selectedPiece[0]] !== 'NA') {
             if (playingAgainstStockfish) {
@@ -1198,8 +1215,7 @@ function drawBoard(board = chessBoard, moveNumber = moveNum, turnToCheck = null)
         if (!foundPieceToMove) piecesToAdd.push('<piece class="' +
             pieceCode[0] + ' ' + pieceCode[1] + '" id="piece' +
             needPiecePos[0] + needPiecePos[1] +
-            '" onclick="pieceClicked(' + needPiecePos[0] + ', ' + needPiecePos[1] +
-            `)" draggable="false" style="transform: translate(${(!flipBoard) ? (needPiecePos[0] * boxSize) + 'px, ' + (needPiecePos[1] * boxSize) :
+            `" onmousedown="mouseDown(this)" style="transform: translate(${(!flipBoard) ? (needPiecePos[0] * boxSize) + 'px, ' + (needPiecePos[1] * boxSize) :
                 ((7 - needPiecePos[0]) * boxSize) + 'px, ' + ((7 - needPiecePos[1]) * boxSize)}px);"></piece`)
     }
     for (let i = 0; i < extraPieces.length; i++) {
@@ -1209,7 +1225,7 @@ function drawBoard(board = chessBoard, moveNumber = moveNum, turnToCheck = null)
 
     piecesToTranslate.forEach(pieceToTranslate => {
         pieceToTranslate.elem.attr('id', pieceToTranslate.newId)
-        pieceToTranslate.elem.attr('onclick', `pieceClicked(${pieceToTranslate.onClickPos})`)
+            // pieceToTranslate.elem.attr('onclick', `pieceClicked(${pieceToTranslate.onClickPos})`)
     })
 
     animations = piecesToTranslate
@@ -1221,8 +1237,8 @@ function drawBoard(board = chessBoard, moveNumber = moveNum, turnToCheck = null)
         // $('piece').removeClass('piece_moved_self piece_moved_other')
     if (pieceMoved !== null) {
         // $("#piece" + pieceMoved[0] + pieceMoved[1]).addClass("piece_moved_" + moveType)
-        piecesLayer.append(`<square draggable="false" class="previous_place_${moveType}" style="transform: translate(${(!flipBoard) ? (oldPos[0] * boxSize) + 'px, ' + (oldPos[1] * boxSize) : ((7 - oldPos[0]) * boxSize) + 'px, ' + ((7 - oldPos[1]) * boxSize)}px);"></square>`)
-        piecesLayer.append(`<square draggable="false" class="piece_moved_${moveType}" style="transform: translate(${(!flipBoard) ? (pieceMoved[0] * boxSize) + 'px, ' + (pieceMoved[1] * boxSize) : ((7 - pieceMoved[0]) * boxSize) + 'px, ' + ((7 - pieceMoved[1]) * boxSize)}px);"></square>`)
+        piecesLayer.append(`<square class="previous_place_${moveType}" style="transform: translate(${(!flipBoard) ? (oldPos[0] * boxSize) + 'px, ' + (oldPos[1] * boxSize) : ((7 - oldPos[0]) * boxSize) + 'px, ' + ((7 - oldPos[1]) * boxSize)}px);"></square>`)
+        piecesLayer.append(`<square class="piece_moved_${moveType}" style="transform: translate(${(!flipBoard) ? (pieceMoved[0] * boxSize) + 'px, ' + (pieceMoved[1] * boxSize) : ((7 - pieceMoved[0]) * boxSize) + 'px, ' + ((7 - pieceMoved[1]) * boxSize)}px);"></square>`)
     }
     reDrawBoard = clone(board)
     animationInterval = setInterval(updateAnimations, 10)
