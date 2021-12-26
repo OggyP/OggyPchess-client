@@ -81,32 +81,40 @@ $(document).mousemove(function(event) {
 
 var pieceBeingDragged = null
 
-function mouseDown(obj) {
+function mouseDown() {
+    console.log("Down clicked")
     if (drawCurrentBoard && !importedPGN) {
-        if (pieceBeingDragged !== null) mouseUp()
-            // console.log("DOWN")
-            // console.log(obj.id)
-        pieceBeingDragged = {
-            "elem": $("#" + obj.id),
-            "pos": {
-                "x": Number(obj.id[5]),
-                "y": Number(obj.id[6])
+        if (pieceBeingDragged !== null) {
+            mouseUp()
+        } else {
+            let chessBoardMousePos = getMousePosOnChessBoard()
+            let piecePos = {
+                'x': Math.floor(chessBoardMousePos.x / boxSize),
+                'y': Math.floor(chessBoardMousePos.y / boxSize)
+            }
+            if (piecePos.x >= 0 && piecePos.x < 8 && piecePos.y >= 0 && piecePos.y < 8) {
+                console.log("DOWN")
+                pieceBeingDragged = {
+                    "elem": $("#piece" + piecePos.x + piecePos.y),
+                    "pos": piecePos
+                }
+                pieceBeingDragged.elem.addClass("dragged")
+                pieceClicked(pieceBeingDragged.pos.x, pieceBeingDragged.pos.y)
+                pieceBeingDragged.elem.css("opacity", "1")
+                draggingUpdateInterval = setInterval(movePiece, 3)
             }
         }
-        pieceBeingDragged.elem.addClass("dragged")
-        pieceClicked(pieceBeingDragged.pos.x, pieceBeingDragged.pos.y)
-        pieceBeingDragged.elem.css("opacity", "1")
-        draggingUpdateInterval = setInterval(movePiece, 3)
     }
 }
 
 document.addEventListener("mouseup", mouseUp);
+document.addEventListener("mousedown", mouseDown);
+
 
 function mouseUp() {
+    console.log("UP")
     if (pieceBeingDragged !== null) {
-        pieceBeingDragged.elem.css("opacity", "0.6")
         pieceBeingDragged.elem.removeClass("dragged")
-            // console.log("UP")
         let chessBoardMousePos = getMousePosOnChessBoard()
         let dropPos = {
                 'x': Math.floor(chessBoardMousePos.x / boxSize),
@@ -124,7 +132,8 @@ function mouseUp() {
             for (let i = 0; i < validMoves.length; i++) {
                 let positionToCheck = validMoves[i]
                 if (positionToCheck.x === dropPos.x && positionToCheck.y === dropPos.y) {
-                    // console.log(positionToCheck)
+                    pieceBeingDragged.elem.css("transform", (!flipBoard) ? `translate(${dropPos.x * boxSize}px, ${dropPos.y * boxSize}px)` : `translate(${(7 - dropPos.x) * boxSize}px, ${(7 - dropPos.y) * boxSize}px)`)
+                        // console.log(positionToCheck)
                     if (positionToCheck.hasOwnProperty('specialCase'))
                         pieceMove(positionToCheck.x, positionToCheck.y, positionToCheck.specialCase)
                     else

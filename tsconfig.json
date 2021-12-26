@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "module": "commonjs",
+        "sourceMap": false,
+        "outDir": "live/resources/newJS"
+    },
+    "exclude": [
+        "live"
+    ]
+}

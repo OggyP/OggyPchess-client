@@ -24,9 +24,6 @@ let audio = {
     "move": new Audio('/resources/audio/move.wav'),
     "capture": new Audio('/resources/audio/capture.wav')
 }
-
-audio.check.pl
-
 const startingPos = [
     ["rd", "nd", "bd", "qd", "kd", "bd", "nd", "rd"],
     ["pd", "pd", "pd", "pd", "pd", "pd", "pd", "pd"],
@@ -147,7 +144,6 @@ function receivedMove(event) {
         else $('#black_timer_text').removeClass('green_background');
     }
     if (chessBoard[event.data.startingPos[1]][event.data.startingPos[0]] !== 'NA') {
-        $("piece").css("opacity", "1")
         pieceMoved = event.data.endingPos
         oldPos = event.data.startingPos
         let audioToPlay = "move"
@@ -210,8 +206,10 @@ function receivedMove(event) {
         boardAtMove.push({ 'board': clone(chessBoard), 'startPos': event.data.startingPos, 'endingPos': event.data.endingPos, 'audio': audioToPlay })
         moveNum++;
     }
-    if (selectedPiece !== null && chessBoard[selectedPiece[1]][selectedPiece[0]] !== 'NA')
-        pieceClicked(selectedPiece[0], selectedPiece[1])
+    if (selectedPiece !== null && chessBoard[selectedPiece[1]][selectedPiece[0]] !== 'NA') {
+        if (pieceBeingDragged === null || selectedPiece[0] !== pieceBeingDragged.pos.x || selectedPiece[1] !== pieceBeingDragged.pos.y)
+            pieceClicked(selectedPiece[0], selectedPiece[1])
+    }
     if (moveNum < 30) {
         if (chessMode === 'standard') {
             if (openingList.hasOwnProperty(pgnText.slice(0, -1))) {
@@ -549,8 +547,6 @@ var validMoves = []
 function pieceClicked(xVal, yVal) {
     validMoves = []
     if (drawCurrentBoard && !importedPGN) {
-        $("piece").css("opacity", "1")
-        $("#piece" + xVal + yVal).css("opacity", "0.6")
         valid_positions.empty()
         selectedPiece = [xVal, yVal]
         let clickedPiece = chessBoard[yVal][xVal]
@@ -1215,7 +1211,7 @@ function drawBoard(board = chessBoard, moveNumber = moveNum, turnToCheck = null)
         if (!foundPieceToMove) piecesToAdd.push('<piece class="' +
             pieceCode[0] + ' ' + pieceCode[1] + '" id="piece' +
             needPiecePos[0] + needPiecePos[1] +
-            `" onmousedown="mouseDown(this)" style="transform: translate(${(!flipBoard) ? (needPiecePos[0] * boxSize) + 'px, ' + (needPiecePos[1] * boxSize) :
+            `" draggable="false" style="transform: translate(${(!flipBoard) ? (needPiecePos[0] * boxSize) + 'px, ' + (needPiecePos[1] * boxSize) :
                 ((7 - needPiecePos[0]) * boxSize) + 'px, ' + ((7 - needPiecePos[1]) * boxSize)}px);"></piece`)
     }
     for (let i = 0; i < extraPieces.length; i++) {

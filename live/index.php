@@ -181,6 +181,7 @@ if (isset($_GET['assets'])) {
             <button class="home_item" id="open-standard" onclick="showTimeSelection(this, 'standard')">Standard</button>
             <button class="home_item" id="open-960" onclick="showTimeSelection(this, '960')">Chess 960</button>
             <button class="home_item" id="open-stockfish" onclick="openHomeMenu(this, '#stockfish-skill-selector')">Versus Stockfish</button>
+            <button class="home_item" id="open-opening-explorer" onclick="openHomeMenu(this, '#stockfish-skill-selector')">Opening Explorer</button>
 
             <br><br>
             <button class="home_item" id="open-import" onclick="openHomeMenu(this, '#import-menu')">
@@ -331,6 +332,8 @@ if (isset($_GET['assets'])) {
     <script src="resources/javascript/multiplayer-chess.js"></script>
     <script src="resources/javascript/wsHandle.js"></script>
     <script src="resources/stockfish/engine.js"></script>
+    <script src="resources/newJS/pieces.js"></script>
+    <script src="resources/newJS/chess.js"></script>
     <script>
         (function fix_workers() {
             var script_tag;
