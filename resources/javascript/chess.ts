@@ -2,10 +2,19 @@ class Game {
     board: Board;
 }
 
+interface CastleInfoOfTeam {
+    kingSide: boolean;
+    queenSide: boolean;
+}
+
 class Board {
     private _squares: Array<Array<ChessPiece>>;
     turn: Teams;
-
+    enPassant: Vector = null;
+    castleInfo: { white: CastleInfoOfTeam, black: CastleInfoOfTeam } = {
+        "white": { "kingSide": false, "queenSide": false },
+        "black": { "kingSide": false, "queenSide": false }
+    };
 
     constructor(FEN: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") {
         // Create an empty board
@@ -13,6 +22,27 @@ class Board {
         for (let i = 0; i < 8; i++)
             this._squares.push([])
         let FENparts = FEN.split(' ')
+        if (FENparts.length !== 6)
+            throw new Error("Invalid FEN, There should be 6 segments.")
+
+        // Set Turn
+        this.turn = (FENparts[1] === 'w') ? "white" : "black"
+
+        // Set Castling
+        for (let i = 0; i < FENparts[2].length; i++) {
+            let char = FENparts[2][i]
+            if (char !== '-') {
+                let teamOfCastlingInfo: Teams = (char === char.toUpperCase()) ? "white" : "black";
+                let sideOfCastlingInfo = (char.toLowerCase() === 'k') ? "kingSide" : "queenSide";
+                this.castleInfo[teamOfCastlingInfo][sideOfCastlingInfo] = true
+            }
+        }
+
+        // Set Enpassant
+        if (FENparts[3] !== '-')
+            this.enPassant = convertToPosition(FENparts[3]);
+
+        // Set Pieces
         let rows = FENparts[0].split('/')
         if (rows.length !== 8)
             throw new Error("Invalid FEN, there needs to be 8 rows specified.")
@@ -46,13 +76,10 @@ class Board {
     }
 }
 
-type Notation = string | [number, number];
+function convertToChessNotation(position: Vector): string {
+    return String.fromCharCode(97 + position[0]) + (8 + position[1]);
+}
 
-function swapNotation(notation: Notation): Notation {
-    if (typeof notation === "string")
-        // From Chess Notation to Board Coords
-        return [parseInt(notation[0], 36) - 10, 8 - Number(notation[1])]
-    else
-        // To Chess Notation from Board Coords
-        return String.fromCharCode(97 + notation[0]) + (8 + notation[1]);
+function convertToPosition(notation: string): Vector {
+    return {"x": parseInt(notation[0], 36) - 10, "y": 8 - Number(notation[1])};
 }

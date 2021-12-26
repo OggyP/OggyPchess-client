@@ -27,11 +27,6 @@ interface VectorsAndPieces {
     vectors: Vector[];
 }
 
-interface CastleInfo {
-    kingSide: boolean;
-    queenSide: boolean;
-}
-
 class RayCastPiece {
     test: boolean;
 
