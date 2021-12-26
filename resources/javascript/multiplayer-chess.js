@@ -309,8 +309,6 @@ function parsePGN(pgn, pgnGameId = 0, opening = '') {
         // Custom starting positions
         if (pgnMetaValues.hasOwnProperty('FEN')) {
             chessBoard = FENtoGame(pgnMetaValues["FEN"])
-        } else if (pgnMetaValues.hasOwnProperty('StartingPos')) {
-            chessBoard = FENtoGame(pgnMetaValues["StartingPos"])
         }
 
         // Other Variants

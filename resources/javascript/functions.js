@@ -183,8 +183,8 @@ function gameFound(data) {
 
     chessBoard = data.board[0]
     if (chessMode !== 'standard') {
-        pgnMetaValues['StartingPos'] = data.board[1]
-        pgnMeta.push('StartingPos')
+        pgnMetaValues['FEN'] = data.board[1]
+        pgnMeta.push('FEN')
         pgnMetaValues['Variant'] = variantNames[chessMode]
         pgnMeta.push('Variant')
     }
