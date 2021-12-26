@@ -52,11 +52,11 @@ include './resources/html/navbar.php'
         echo $os;
         echo '<br>';
         if ($os == 'Linux') {
-            echo "This is the BEST OS!";
+            echo "This is the WORST OS!";
         } elseif ($os == 'Windows') {
-            echo 'This is the WORST OS EVER TO EXIST';
+            echo 'This is the BEST OS EVER TO EXIST';
         } else {
-            echo "Use linux :gun:";
+            echo "Don't use linux :gun:";
         }
         ?>
     </h1>
