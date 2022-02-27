@@ -1,0 +1,45 @@
+body {
+	background-color: #1f1f1f;
+}
+
+html {
+	font-family: 'Noto Sans JP', sans-serif;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+h1 {
+	text-align: center;
+	font-size: 60px;
+	height: 10vh;
+	color: white;
+}
+
+p {
+	text-align: center;
+	color: white;
+	font-size: 30px;
+	margin-bottom: auto;
+}
+
+.panel {
+	background-color: #171717;
+	border-radius: 5px;
+	width: 50vw;
+	height: 85vh;
+	margin: auto;
+	padding: 5vh 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#canvas {
+	width: 40vw;
+	height: 40vw;
+	background-color: white;
+}

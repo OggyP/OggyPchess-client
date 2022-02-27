@@ -3,7 +3,7 @@
 <?php
 $gameInfo = null;
 $pgnVal = null;
-$assetURL = '<link rel="stylesheet" href="/resources/svg/pieces/pieces.css">';
+$assetURL = '<link rel="stylesheet" href="/resources/svg/pieces/default.css">';
 if (isset($_GET['game'])) {
     $isViewingGame = true;
     $gameId = $_GET['game'];
@@ -47,6 +47,12 @@ if (isset($_GET['assets'])) {
     }
     if ($assetType == 'horsey') {
         $assetURL = '<link rel="stylesheet" href="/resources/svg/pieces/horsey.css">';
+    }
+    if ($assetType == 'lichess') {
+        $assetURL = '<link rel="stylesheet" href="/resources/svg/pieces/lichess.css">';
+    }
+    if ($assetType == 'sus') {
+        $assetURL = '<link rel="stylesheet" href="/resources/svg/pieces/sus.css">';
     }
 }
 ?>
@@ -332,8 +338,6 @@ if (isset($_GET['assets'])) {
     <script src="resources/javascript/multiplayer-chess.js"></script>
     <script src="resources/javascript/wsHandle.js"></script>
     <script src="resources/stockfish/engine.js"></script>
-    <script src="resources/newJS/pieces.js"></script>
-    <script src="resources/newJS/chess.js"></script>
     <script>
         (function fix_workers() {
             var script_tag;

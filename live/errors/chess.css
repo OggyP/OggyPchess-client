@@ -3,12 +3,17 @@
 /* #131313 */
 
 #chess_board {
-    /*height: 800px;*/
-    /*width: 800px;*/
+    height: 100%;
+    width: 100%;
     min-width: 100px;
     min-height: 100px;
     overflow: hidden;
-    background-image: url('/resources/svg/chessBoards/default.svg');
+    background-image: url('/resources/svg/chessBoards/brownBoard.svg');
+}
+
+#chess_board-wrapper {
+    width: 100%;
+    height: 100%;
 }
 
 #pieces_layer,
@@ -150,6 +155,10 @@ piece.dragged {
 
 .previous_place_other {
     background-color: #ff535377;
+}
+
+.illegal_square {
+	background-color: #ff0000;
 }
 
 #home {

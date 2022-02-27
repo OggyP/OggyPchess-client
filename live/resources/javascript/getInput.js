@@ -92,16 +92,22 @@ function mouseDown() {
                 'x': Math.floor(chessBoardMousePos.x / boxSize),
                 'y': Math.floor(chessBoardMousePos.y / boxSize)
             }
+            if (flipBoard) {
+                piecePos.x = 7 - piecePos.x
+                piecePos.y = 7 - piecePos.y
+            }
             if (piecePos.x >= 0 && piecePos.x < 8 && piecePos.y >= 0 && piecePos.y < 8) {
-                console.log("DOWN")
-                pieceBeingDragged = {
-                    "elem": $("#piece" + piecePos.x + piecePos.y),
-                    "pos": piecePos
+                if (reDrawBoard[piecePos.y][piecePos.x] !== "NA") {
+                    console.log("DOWN")
+                    pieceBeingDragged = {
+                        "elem": $("#piece" + piecePos.x + piecePos.y),
+                        "pos": piecePos
+                    }
+                    pieceBeingDragged.elem.addClass("dragged")
+                    pieceClicked(pieceBeingDragged.pos.x, pieceBeingDragged.pos.y)
+                    pieceBeingDragged.elem.css("opacity", "1")
+                    draggingUpdateInterval = setInterval(movePiece, 3)
                 }
-                pieceBeingDragged.elem.addClass("dragged")
-                pieceClicked(pieceBeingDragged.pos.x, pieceBeingDragged.pos.y)
-                pieceBeingDragged.elem.css("opacity", "1")
-                draggingUpdateInterval = setInterval(movePiece, 3)
             }
         }
     }

@@ -51,7 +51,7 @@ function checkForToken() {
 }
 
 var ownUserId = 0
-var adminUserIds = [1]
+var adminUserIds = []
 
 function loginSuccess(data) {
     ownUserId = data.userId
